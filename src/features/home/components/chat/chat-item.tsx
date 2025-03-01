@@ -1,9 +1,8 @@
 "use client";
-import { MessageCircle, Trash2 } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { SidebarMenuAction } from "@/components/ui/sidebar";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { SidebarMenuItem } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -36,14 +35,12 @@ interface ChatItemProps {
   chat: Chat;
   activeChatId: string;
   setActiveChatId: (id: string) => void;
-  handleDeleteChat: (id: string) => void;
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({
   chat,
   activeChatId,
   setActiveChatId,
-  handleDeleteChat,
 }) => {
   const { state } = useSidebar();
   const isExpanded = state === "expanded";

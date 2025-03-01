@@ -1,19 +1,23 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { type PropsWithChildren, useEffect, useRef } from "react";
 
 import {
   Sidebar,
   SidebarContent,
   SidebarInset,
-  SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Routes } from "@/constants/navigation";
 import ChatItem from "@/features/home/components/chat/chat-item";
 import SidebarFooter from "@/features/home/components/sidebar/sidebar-footer";
 import SidebarHeader from "@/features/home/components/sidebar/siderbar-header";
+import useAuthStore from "@/store/use-auth-store";
 import { useChatStore } from "@/store/use-chat-store";
 
 const MainLayoutContent = ({ children }: PropsWithChildren) => {
+  const { push } = useRouter();
+  const { user, isLoading } = useAuthStore();
   const {
     chats,
     activeChatId,
@@ -22,7 +26,6 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     setSearchQuery,
     setActiveChatId,
     handleNewChat,
-    handleDeleteChat,
   } = useChatStore();
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -35,6 +38,11 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChatId]);
+
+  if (!user && !isLoading) {
+    push(Routes.SignIn);
+    return null;
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50">
@@ -53,7 +61,6 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
               chat={chat}
               activeChatId={activeChatId}
               setActiveChatId={setActiveChatId}
-              handleDeleteChat={handleDeleteChat}
             />
           ))}
         </SidebarContent>
