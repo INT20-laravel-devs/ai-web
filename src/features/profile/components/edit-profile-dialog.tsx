@@ -1,4 +1,3 @@
-import { Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
@@ -17,28 +16,55 @@ import UserAvatar from "@/components/user-avatar";
 import { type User } from "@/features/auth/types/auth-types";
 import useAuthStore, { hydrateAuthStore } from "@/store/use-auth-store";
 
+import { updateAvatar, updateProfile } from "../api/profile-api";
+
 const EditProfileDialog = () => {
-  const { user, setUser } = useAuthStore();
+  const { user } = useAuthStore();
   const [editUser, setEditUser] = useState<User>(user!);
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSave = () => {
-    hydrateAuthStore(editUser);
-    console.log("Saving user data:", editUser);
-    setOpen(false);
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      // Handle avatar update
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("file", avatarFile);
+        console.log(avatarFile);
+        await updateAvatar(formData);
+      }
+
+      // Handle profile update
+      if (user?.username !== editUser.username) {
+        await updateProfile(user!.id, editUser.username);
+      }
+
+      // Update local state
+      hydrateAuthStore(editUser);
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetForm = () => {
     setEditUser(user!);
+    setAvatarFile(null);
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      setAvatarFile(file);
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setEditUser((prev) => ({
@@ -109,10 +135,16 @@ const EditProfileDialog = () => {
           </div>
         </div>
         <DialogFooter className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

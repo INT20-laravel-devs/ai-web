@@ -5,3 +5,10 @@ export const generateAuthHeaders = () => {
     Authorization: `Bearer ${token}`,
   };
 };
+
+export const generateAuthHeadersAvatar = () => {
+  const token = localStorage.getItem("token");
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
