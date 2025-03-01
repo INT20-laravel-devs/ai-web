@@ -18,6 +18,8 @@ interface ChatState {
   handleNewChat: () => void;
   handleDeleteChat: (chatId: string) => void;
   handleCopyMessage: (content: string) => void;
+  handleRenameChat: (chatId: string, newTitle: string) => void;
+  handleShareChat: (chatId: string) => void;
 }
 
 interface FormattedDateTime {
@@ -142,4 +144,49 @@ export const useChatStore = create<ChatState>((set) => ({
       console.error("Failed to copy to clipboard:", error);
     });
   },
+
+  // New function to rename a chat
+  handleRenameChat: (chatId: string, newTitle: string) =>
+    set((state) => {
+      if (!newTitle.trim()) return state;
+
+      const updatedChats = state.chats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              title: newTitle.trim(),
+            }
+          : chat,
+      );
+
+      return { chats: updatedChats };
+    }),
+
+  // New function to share a chat
+  handleShareChat: (chatId: string) =>
+    set((state) => {
+      // Find the chat to share
+      const chatToShare = state.chats.find((chat) => chat.id === chatId);
+
+      if (!chatToShare) return state;
+
+      // Create a shareable text version of the chat
+      const chatContent = chatToShare.messages
+        .map(
+          (msg) => `${msg.sender === "user" ? "User" : "AI"}: ${msg.content}\n`,
+        )
+        .join("\n");
+
+      const shareableContent = `${chatToShare.title}\n\n${chatContent}`;
+
+      // Copy to clipboard
+      void navigator.clipboard.writeText(shareableContent).catch((error) => {
+        console.error("Failed to copy chat to clipboard:", error);
+      });
+
+      // In a real application, you might want to generate a shareable link
+      // or implement a more sophisticated sharing mechanism
+
+      return state; // No state changes needed
+    }),
 }));

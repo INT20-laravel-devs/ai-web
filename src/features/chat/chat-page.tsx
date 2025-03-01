@@ -1,42 +1,18 @@
 "use client";
-import React, {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useRef, useEffect } from "react";
+import { toast } from "sonner";
 
 import ChatHeader from "@/features/home/components/chat/chat-header";
 import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
 import MessageInput from "@/features/home/components/message-input";
+import { TypingIndicator } from "@/features/home/components/chat/chat-icons";
 import { useChatStore } from "@/store/use-chat-store";
-
-import { TypingIndicator } from "../home/components/chat/chat-icons";
-import { type Chat } from "./types/chat-types";
-
-interface ChatStore {
-  chats: Chat[];
-  activeChatId: string;
-  inputMessage: string;
-  isTyping: boolean;
-  setInputMessage: (message: string) => void;
-  handleSendMessage: () => void;
-  handleCopyMessage: (messageId: string) => void;
-}
-
-const adaptSetInputMessage = (
-  setInputMessage: (message: string) => void,
-): Dispatch<SetStateAction<string>> => {
-  return (value) => {
-    if (typeof value === "function") {
-      const prevValue = useChatStore.getState().inputMessage;
-      setInputMessage(value(prevValue));
-    } else {
-      setInputMessage(value);
-    }
-  };
-};
+import { useDialogs } from "@/hooks/use-dialog";
+import { adaptSetInputMessage } from "@/utils/input-utils";
+import { DeleteDialog } from "@/features/home/components/dialog/delete-dialog";
+import { RenameDialog } from "@/features/home/components/dialog/rename-dialog";
+import { Chat } from "@/types/chat-types";
 
 const ChatPage: React.FC = () => {
   const {
@@ -47,27 +23,49 @@ const ChatPage: React.FC = () => {
     setInputMessage: storeSetInputMessage,
     handleSendMessage,
     handleCopyMessage,
+    handleDeleteChat,
+    handleRenameChat,
+    handleShareChat,
   } = useChatStore();
 
   const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const activeChat =
-    chats.find((chat) => chat.id === activeChatId) ??
-    ({
-      id: "",
-      title: "",
-      lastActive: "",
-      messages: [],
-    } as Chat);
+  const {
+    isRenameDialogOpen,
+    isDeleteDialogOpen,
+    newChatTitle,
+    setNewChatTitle,
+    handleOpenRenameDialog,
+    handleOpenDeleteDialog,
+    handleConfirmRename,
+    handleConfirmDelete,
+    setIsRenameDialogOpen,
+    setIsDeleteDialogOpen,
+  } = useDialogs(activeChatId, handleRenameChat, handleDeleteChat);
 
+  const activeChat = findActiveChat(chats, activeChatId);
+
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat.messages, isTyping]);
 
+  const handleShare = () => {
+    handleShareChat(activeChatId);
+    toast.success("Chat shared", {
+      description: "Chat content copied to clipboard.",
+    });
+  };
+
   return (
-    <div className="w-full flex-1 bg-gray-50">
-      <ChatHeader activeChat={activeChat} />
+    <div className="flex flex-1 flex-col bg-gray-50">
+      <ChatHeader
+        activeChat={activeChat}
+        onEdit={() => handleOpenRenameDialog(activeChat.title)}
+        onDelete={handleOpenDeleteDialog}
+        onShare={handleShare}
+      />
 
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
         {activeChat.messages.length === 0 ? (
@@ -92,8 +90,35 @@ const ChatPage: React.FC = () => {
         setInputMessage={setInputMessage}
         handleSendMessage={handleSendMessage}
       />
+
+      {/* Dialogs */}
+      <RenameDialog
+        isOpen={isRenameDialogOpen}
+        setIsOpen={setIsRenameDialogOpen}
+        title={newChatTitle}
+        setTitle={setNewChatTitle}
+        onConfirm={handleConfirmRename}
+      />
+
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        setIsOpen={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
+
+// Fixed with proper types
+function findActiveChat(chats: Chat[], activeChatId: string): Chat {
+  return (
+    chats.find((chat) => chat.id === activeChatId) || {
+      id: "",
+      title: "",
+      lastActive: "",
+      messages: [],
+    }
+  );
+}
 
 export default ChatPage;
