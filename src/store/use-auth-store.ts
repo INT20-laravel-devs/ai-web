@@ -4,11 +4,13 @@ import { type User } from "@/features/auth/types/auth-types";
 
 interface AuthStore {
   user: User | null;
+  setUser: (user: User) => void;
   isLoading: boolean;
 }
 
-const useAuthStore = create<AuthStore>(() => ({
+const useAuthStore = create<AuthStore>((set) => ({
   user: null,
+  setUser: (user) => set({ user }),
   isLoading: true,
 }));
 
