@@ -3,8 +3,8 @@ import { toast } from "sonner";
 
 export const useDialogs = (
   activeChatId: string,
-  handleRenameChat: (chatId: string, newTitle: string) => void,
-  handleDeleteChat: (chatId: string) => void,
+  // handleRenameChat: (chatId: string, newTitle: string) => void,
+  // handleDeleteChat: (chatId: string) => void,
 ) => {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -14,28 +14,28 @@ export const useDialogs = (
     setNewChatTitle(currentTitle);
     setIsRenameDialogOpen(true);
   };
-
-  const handleConfirmRename = () => {
-    if (newChatTitle.trim()) {
-      handleRenameChat(activeChatId, newChatTitle);
-      setIsRenameDialogOpen(false);
-      toast.success("Chat renamed", {
-        description: "Your chat has been renamed successfully.",
-      });
-    }
-  };
+  //
+  // const handleConfirmRename = () => {
+  //   if (newChatTitle.trim()) {
+  //     handleRenameChat(activeChatId, newChatTitle);
+  //     setIsRenameDialogOpen(false);
+  //     toast.success("Chat renamed", {
+  //       description: "Your chat has been renamed successfully.",
+  //     });
+  //   }
+  // };
 
   const handleOpenDeleteDialog = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    handleDeleteChat(activeChatId);
-    setIsDeleteDialogOpen(false);
-    toast.success("Chat deleted", {
-      description: "Your chat has been deleted.",
-    });
-  };
+  // const handleConfirmDelete = () => {
+  //   handleDeleteChat(activeChatId);
+  //   setIsDeleteDialogOpen(false);
+  //   toast.success("Chat deleted", {
+  //     description: "Your chat has been deleted.",
+  //   });
+  // };
 
   return {
     isRenameDialogOpen,
@@ -44,8 +44,8 @@ export const useDialogs = (
     setNewChatTitle,
     handleOpenRenameDialog,
     handleOpenDeleteDialog,
-    handleConfirmRename,
-    handleConfirmDelete,
+    // handleConfirmRename,
+    // handleConfirmDelete,
     setIsRenameDialogOpen,
     setIsDeleteDialogOpen,
   };

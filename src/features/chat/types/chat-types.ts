@@ -1,8 +1,6 @@
 export interface Message {
-  id: string;
+  threadId: string;
   content: string;
-  sender: "user" | "ai";
-  timestamp: string;
 }
 
 export interface Chat {
@@ -15,4 +13,13 @@ export interface Chat {
 export interface PromptExample {
   title: string;
   description: string;
+}
+
+export interface ChatBody {
+  name: string;
+  description: string;
+  threadId: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
 }

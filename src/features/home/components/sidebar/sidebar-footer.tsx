@@ -9,11 +9,7 @@ import UserAvatar from "@/components/user-avatar";
 import { Routes } from "@/constants/navigation";
 import useAuthStore from "@/store/use-auth-store";
 
-interface SidebarFooterProps {
-  isSidebarOpen: boolean;
-}
-
-const SidebarFooter: React.FC<SidebarFooterProps> = ({ isSidebarOpen }) => {
+const SidebarFooter = () => {
   const { user } = useAuthStore();
   const { state } = useSidebar();
   const isExpanded = state === "expanded";

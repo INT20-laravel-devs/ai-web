@@ -7,8 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type Chat } from "@/features/chat/types/chat-types";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { type Chat } from "@/features/chat/types/chat-types";
 
 interface ChatHeaderProps {
   activeChat: Chat;
@@ -21,7 +21,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   activeChat,
   onEdit,
   onDelete,
-  onShare,
 }) => (
   <div className="flex items-center justify-between border-b border-gray-200 bg-white p-4 shadow-sm">
     <div className="flex items-center">
@@ -49,7 +48,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             <Edit className="mr-2 h-4 w-4" />
             <span>Rename Chat</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onShare} className="cursor-pointer">
+          <DropdownMenuItem className="cursor-pointer">
             <Share2 className="mr-2 h-4 w-4" />
             <span>Share Chat</span>
           </DropdownMenuItem>

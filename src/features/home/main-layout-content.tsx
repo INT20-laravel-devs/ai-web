@@ -1,43 +1,44 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { type PropsWithChildren, useEffect, useRef } from "react";
+import { parseAsString, useQueryState } from "nuqs";
+import { type PropsWithChildren, useEffect, useRef, useState } from "react";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 import { Routes } from "@/constants/navigation";
-import ChatItem from "@/features/home/components/chat/chat-item";
+import { createChat } from "@/features/chat/api/chat-api";
+import ChatsSection from "@/features/home/components/chat/chats-section";
 import SidebarFooter from "@/features/home/components/sidebar/sidebar-footer";
 import SidebarHeader from "@/features/home/components/sidebar/siderbar-header";
 import useAuthStore from "@/store/use-auth-store";
 import { useChatStore } from "@/store/use-chat-store";
 
 const MainLayoutContent = ({ children }: PropsWithChildren) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [threadId, setThreadId] = useQueryState(
+    "threadId",
+    parseAsString.withDefault(""),
+  );
   const { push } = useRouter();
   const { user, isLoading } = useAuthStore();
-  const {
-    chats,
-    activeChatId,
-    isSidebarOpen,
-    searchQuery,
-    setSearchQuery,
-    setActiveChatId,
-    handleNewChat,
-  } = useChatStore();
+  const { chats, addChat } = useChatStore();
+
+  console.log(chats);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const filteredChats = searchQuery
-    ? chats.filter((chat) =>
-        chat.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : chats;
+
+  const handleNewChat = async () => {
+    try {
+      const chatBody = await createChat();
+      await setThreadId(chatBody.threadId);
+      addChat(chatBody);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeChatId]);
+  }, [threadId]);
 
   if (!user && !isLoading) {
     push(Routes.SignIn);
@@ -54,22 +55,13 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
         />
 
         <SidebarContent className="flex-1 gap-0">
-          {filteredChats.map((chat) => (
-            <ChatItem
-              key={chat.id}
-              chat={chat}
-              activeChatId={activeChatId}
-              setActiveChatId={setActiveChatId}
-            />
-          ))}
+          {user && <ChatsSection user={user} searchQuery={searchQuery} />}
         </SidebarContent>
 
-        <SidebarFooter isSidebarOpen={isSidebarOpen} />
+        <SidebarFooter />
       </Sidebar>
 
-      <SidebarInset className="h-full w-full flex-col">
-        {children}
-      </SidebarInset>
+      <SidebarInset className="h-full w-full flex-col">{children}</SidebarInset>
     </div>
   );
 };
