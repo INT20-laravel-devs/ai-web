@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import { type Chat, type Message } from "@/features/chat/types/chat-types";
 import { initialChats } from "@/features/home/data/mock-data";
+import { socket } from "@/lib/socket"; // Import your existing socket instance
 
 interface ChatState {
   chats: Chat[];
@@ -14,6 +15,8 @@ interface ChatState {
   setInputMessage: (message: string) => void;
   setIsSidebarOpen: () => void;
   setActiveChatId: (chatId: string) => void;
+  initializeSocketListeners: () => void;
+  cleanupSocketListeners: () => void;
   handleSendMessage: () => void;
   handleNewChat: () => void;
   handleDeleteChat: (chatId: string) => void;
@@ -36,7 +39,7 @@ const getFormattedDateTime = (): FormattedDateTime => {
   return { timeString, dateString: "Today" };
 };
 
-export const useChatStore = create<ChatState>((set) => ({
+export const useChatStore = create<ChatState>((set, get) => ({
   chats: initialChats,
   activeChatId: "1",
   inputMessage: "",
@@ -48,13 +51,84 @@ export const useChatStore = create<ChatState>((set) => ({
   setInputMessage: (message: string) => set({ inputMessage: message }),
   setIsSidebarOpen: () =>
     set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-  setActiveChatId: (chatId: string) => set({ activeChatId: chatId }),
+
+  setActiveChatId: (chatId: string) => {
+    const { activeChatId } = get();
+
+    // Leave current room if we have an active chat
+    if (activeChatId) {
+      socket.emit("leave", { threadId: activeChatId });
+    }
+
+    // Join new room
+    socket.emit("join", { threadId: chatId });
+
+    set({ activeChatId: chatId });
+  },
+
+  initializeSocketListeners: () => {
+    const { activeChatId } = get();
+
+    // Join initial room
+    if (activeChatId) {
+      socket.emit("join", { threadId: activeChatId });
+    }
+
+    // Listen for incoming messages
+    socket.on("message", (message) => {
+      set((state) => {
+        const updatedChats = state.chats.map((chat) =>
+          chat.id === state.activeChatId
+            ? {
+                ...chat,
+                lastActive: message.timestamp || new Date().toLocaleString(),
+                messages: [...chat.messages, message],
+              }
+            : chat,
+        );
+        return { chats: updatedChats, isTyping: false };
+      });
+    });
+
+    // Listen for chat history when joining a room
+    socket.on("join", (messages: Message[]) => {
+      set((state) => {
+        const updatedChats = state.chats.map((chat) =>
+          chat.id === state.activeChatId
+            ? {
+                ...chat,
+                messages: messages,
+              }
+            : chat,
+        );
+        return { chats: updatedChats };
+      });
+    });
+  },
+
+  cleanupSocketListeners: () => {
+    socket.off("message");
+    socket.off("join");
+
+    const { activeChatId } = get();
+    if (activeChatId) {
+      socket.emit("leave", { threadId: activeChatId });
+    }
+  },
 
   handleSendMessage: () =>
     set((state) => {
       if (!state.inputMessage.trim()) return state;
 
       const { timeString, dateString } = getFormattedDateTime();
+
+      const messageData = {
+        content: state.inputMessage,
+        threadId: state.activeChatId,
+        timestamp: `${dateString}, ${timeString}`,
+      };
+
+      // Add the message locally first (optimistic update)
       const updatedChats = state.chats.map((chat) =>
         chat.id === state.activeChatId
           ? {
@@ -73,39 +147,8 @@ export const useChatStore = create<ChatState>((set) => ({
           : chat,
       );
 
-      const currentMessage = state.inputMessage;
-      void new Promise<void>((resolve) => {
-        setTimeout(() => {
-          set((prevState) => {
-            const { timeString, dateString } = getFormattedDateTime();
-            return {
-              chats: prevState.chats.map((chat) =>
-                chat.id === prevState.activeChatId
-                  ? {
-                      ...chat,
-                      lastActive: `${dateString}, ${timeString}`,
-                      messages: [
-                        ...chat.messages,
-                        {
-                          id: `m${Date.now()}`,
-                          content: `I've analyzed your inquiry regarding "${currentMessage}". Based on current industry standards and best practices, here's a comprehensive assessment that addresses your specific needs.`,
-                          sender: "ai",
-                          timestamp: `${dateString}, ${timeString}`,
-                        } as Message,
-                      ],
-                    }
-                  : chat,
-              ),
-              isTyping: false,
-            };
-          });
-          resolve();
-        }, 1500);
-      }).catch((error) => {
-        console.error("Error during message handling:", error);
-        // Reset typing state in case of error
-        set({ isTyping: false });
-      });
+      // Send message to server via socket
+      socket.emit("message", messageData);
 
       return { chats: updatedChats, inputMessage: "", isTyping: true };
     }),
@@ -119,6 +162,16 @@ export const useChatStore = create<ChatState>((set) => ({
         lastActive: `Today, ${timeString}`,
         messages: [],
       };
+
+      // Leave current chat room
+      const { activeChatId } = get();
+      if (activeChatId) {
+        socket.emit("leave", { threadId: activeChatId });
+      }
+
+      // Join the new chat room
+      socket.emit("join", { threadId: newChat.id });
+
       return {
         chats: [...state.chats, newChat],
         activeChatId: newChat.id,
@@ -129,13 +182,26 @@ export const useChatStore = create<ChatState>((set) => ({
   handleDeleteChat: (chatId: string) =>
     set((state) => {
       if (state.chats.length <= 1) return state;
+
+      // Leave the chat room if it's the active one
+      if (chatId === state.activeChatId) {
+        socket.emit("leave", { threadId: chatId });
+      }
+
       const updatedChats = state.chats.filter((chat) => chat.id !== chatId);
+      const newActiveId =
+        chatId === state.activeChatId
+          ? updatedChats[0]?.id
+          : state.activeChatId;
+
+      // Join new active chat room if needed
+      if (chatId === state.activeChatId && newActiveId) {
+        socket.emit("join", { threadId: newActiveId });
+      }
+
       return {
         chats: updatedChats,
-        activeChatId:
-          chatId === state.activeChatId
-            ? updatedChats[0]?.id
-            : state.activeChatId,
+        activeChatId: newActiveId,
       };
     }),
 
@@ -145,7 +211,6 @@ export const useChatStore = create<ChatState>((set) => ({
     });
   },
 
-  // New function to rename a chat
   handleRenameChat: (chatId: string, newTitle: string) =>
     set((state) => {
       if (!newTitle.trim()) return state;
@@ -162,7 +227,6 @@ export const useChatStore = create<ChatState>((set) => ({
       return { chats: updatedChats };
     }),
 
-  // New function to share a chat
   handleShareChat: (chatId: string) =>
     set((state) => {
       // Find the chat to share
@@ -183,9 +247,6 @@ export const useChatStore = create<ChatState>((set) => ({
       void navigator.clipboard.writeText(shareableContent).catch((error) => {
         console.error("Failed to copy chat to clipboard:", error);
       });
-
-      // In a real application, you might want to generate a shareable link
-      // or implement a more sophisticated sharing mechanism
 
       return state; // No state changes needed
     }),

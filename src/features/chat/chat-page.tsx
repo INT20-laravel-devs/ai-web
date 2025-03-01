@@ -21,6 +21,8 @@ const ChatPage: React.FC = () => {
     activeChatId,
     inputMessage,
     isTyping,
+    initializeSocketListeners,
+    cleanupSocketListeners,
     setInputMessage: storeSetInputMessage,
     handleSendMessage,
     handleCopyMessage,
@@ -47,6 +49,16 @@ const ChatPage: React.FC = () => {
 
   const activeChat = findActiveChat(chats, activeChatId);
 
+  // Initialize socket listeners when component mounts
+  useEffect(() => {
+    initializeSocketListeners();
+
+    // Clean up socket listeners when component unmounts
+    return () => {
+      cleanupSocketListeners();
+    };
+  }, [initializeSocketListeners, cleanupSocketListeners]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat.messages, isTyping]);
@@ -60,45 +72,36 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col bg-gray-50">
-      {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-white shadow-sm">
-        <ChatHeader
-          activeChat={activeChat}
-          onEdit={() => handleOpenRenameDialog(activeChat.title)}
-          onDelete={handleOpenDeleteDialog}
-          onShare={handleShare}
-        />
+      <ChatHeader
+        activeChat={activeChat}
+        onEdit={() => handleOpenRenameDialog(activeChat.title)}
+        onDelete={handleOpenDeleteDialog}
+        onShare={handleShare}
+      />
+
+      <div className="w-full flex-1 space-y-6 overflow-y-auto p-6">
+        {activeChat.messages.length === 0 ? (
+          <EmptyChatPlaceholder setInputMessage={setInputMessage} />
+        ) : (
+          activeChat.messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              handleCopyMessage={handleCopyMessage}
+            />
+          ))
+        )}
+
+        {isTyping && <TypingIndicator />}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Scrollable Content Area */}
-      <div className="flex h-[calc(100vh-130px)] flex-col overflow-hidden">
-        <div className="w-full flex-1 space-y-6 overflow-y-auto p-12">
-          {activeChat.messages.length === 0 ? (
-            <EmptyChatPlaceholder setInputMessage={setInputMessage} />
-          ) : (
-            activeChat.messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                handleCopyMessage={handleCopyMessage}
-              />
-            ))
-          )}
-
-          {isTyping && <TypingIndicator />}
-
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* Message Input - Fixed at Bottom */}
-      <div className="sticky bottom-0 border-t border-gray-200 bg-white">
-        <MessageInput
-          inputMessage={inputMessage}
-          setInputMessage={setInputMessage}
-          handleSendMessage={handleSendMessage}
-        />
-      </div>
+      <MessageInput
+        inputMessage={inputMessage}
+        setInputMessage={setInputMessage}
+        handleSendMessage={handleSendMessage}
+      />
 
       {/* Dialogs */}
       <RenameDialog
