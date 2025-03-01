@@ -53,9 +53,9 @@ const SignInForm = ({ className }: SignInFormProps) => {
       </div>
       <div className="grid gap-6">
         <Input
-          id="email"
-          type="email"
-          label="Email"
+          id="emailOrUsername"
+          type="text"
+          label="Email / Username"
           error={errors.emailOrUsername?.message}
           placeholder="m@example.com"
           {...register("emailOrUsername")}

@@ -7,7 +7,7 @@ export const signUpSchema = z.object({
 });
 
 export const signInSchema = z.object({
-  emailOrUsername: z.string().email("Invalid email address"),
+  emailOrUsername: z.string(),
   password: z.string().min(8, "Password must be at least 6 characters"),
 });
 
