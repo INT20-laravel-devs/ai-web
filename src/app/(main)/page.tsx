@@ -1,7 +1,5 @@
-import HomePage from "@/features/home/home-chat";
-
 const Home = () => {
-  return <HomePage />;
+  return <div>home</div>;
 };
 
 export default Home;

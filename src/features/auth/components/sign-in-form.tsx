@@ -24,7 +24,7 @@ const SignInForm = ({ className }: SignInFormProps) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   });
@@ -56,9 +56,9 @@ const SignInForm = ({ className }: SignInFormProps) => {
           id="email"
           type="email"
           label="Email"
-          error={errors.emailOrNickname?.message}
+          error={errors.emailOrUsername?.message}
           placeholder="m@example.com"
-          {...register("emailOrNickname")}
+          {...register("emailOrUsername")}
         />
         <Input
           id="password"
@@ -67,7 +67,7 @@ const SignInForm = ({ className }: SignInFormProps) => {
           type="password"
           {...register("password")}
         />
-        <Button type="submit" className="w-full">
+        <Button isLoading={isSubmitting} type="submit" className="w-full">
           Login
         </Button>
       </div>

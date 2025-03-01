@@ -2,10 +2,12 @@ import { API_URL } from "@/constants/global";
 import {
   type EmailResendRequest,
   type SignInFormData,
+  type SignInResponse,
   type SignUpFormData,
   type User,
 } from "@/features/auth/types/auth-types";
 import { type ErrorResponse } from "@/types/api";
+import { generateAuthHeaders } from "@/utils/api-utils";
 
 export const signIn = async (data: SignInFormData) => {
   try {
@@ -22,7 +24,8 @@ export const signIn = async (data: SignInFormData) => {
       throw new Error(error.message);
     }
 
-    return response;
+    const result = (await response.json()) as SignInResponse;
+    localStorage.setItem("token", result.token);
   } catch (e) {
     throw e;
   }
@@ -90,9 +93,7 @@ export const getMe = async () => {
   try {
     const response = await fetch(`${API_URL}/auth/me`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: generateAuthHeaders(),
     });
 
     if (!response.ok) {

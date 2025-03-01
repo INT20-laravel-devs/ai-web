@@ -24,7 +24,7 @@ const SignUpForm = ({ className }: SignUpFormProps) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   });
@@ -55,9 +55,9 @@ const SignUpForm = ({ className }: SignUpFormProps) => {
         <Input
           id="name"
           label="Name"
-          error={errors.nickname?.message}
+          error={errors.username?.message}
           placeholder="John Doe"
-          {...register("nickname")}
+          {...register("username")}
         />
         <Input
           id="email"
@@ -74,7 +74,7 @@ const SignUpForm = ({ className }: SignUpFormProps) => {
           type="password"
           {...register("password")}
         />
-        <Button type="submit" className="w-full">
+        <Button isLoading={isSubmitting} type="submit" className="w-full">
           Sign up
         </Button>
       </div>
