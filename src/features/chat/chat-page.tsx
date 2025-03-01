@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect,useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import ChatHeader from "@/features/home/components/chat/chat-header";
@@ -47,7 +47,6 @@ const ChatPage: React.FC = () => {
 
   const activeChat = findActiveChat(chats, activeChatId);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat.messages, isTyping]);
@@ -60,7 +59,7 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-gray-50">
+    <div className="flex w-full flex-1 flex-col bg-gray-50">
       <ChatHeader
         activeChat={activeChat}
         onEdit={() => handleOpenRenameDialog(activeChat.title)}
@@ -68,7 +67,7 @@ const ChatPage: React.FC = () => {
         onShare={handleShare}
       />
 
-      <div className="flex-1 space-y-6 overflow-y-auto p-6">
+      <div className="w-full flex-1 space-y-6 overflow-y-auto p-6">
         {activeChat.messages.length === 0 ? (
           <EmptyChatPlaceholder setInputMessage={setInputMessage} />
         ) : (
@@ -110,12 +109,12 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Fixed with proper types
-const findActiveChat = (chats: Chat[], activeChatId: string): Chat => chats.find((chat) => chat.id === activeChatId) ?? {
-      id: "",
-      title: "",
-      lastActive: "",
-      messages: [],
-    };
+const findActiveChat = (chats: Chat[], activeChatId: string): Chat =>
+  chats.find((chat) => chat.id === activeChatId) ?? {
+    id: "",
+    title: "",
+    lastActive: "",
+    messages: [],
+  };
 
 export default ChatPage;

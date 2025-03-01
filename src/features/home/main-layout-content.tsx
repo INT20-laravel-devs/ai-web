@@ -37,7 +37,7 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
   }, [activeChatId]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
       <Sidebar className="border-r border-gray-200 bg-white shadow-md">
         <SidebarHeader
           isSidebarOpen={isSidebarOpen}
@@ -61,11 +61,9 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
         <SidebarFooter isSidebarOpen={isSidebarOpen} />
       </Sidebar>
 
-      <SidebarInset className="flex flex-col">
-        <div>
-          <SidebarTrigger />
-          {children}
-        </div>
+      <SidebarInset className="h-full w-full flex-col">
+        <SidebarTrigger />
+        {children}
       </SidebarInset>
     </div>
   );
