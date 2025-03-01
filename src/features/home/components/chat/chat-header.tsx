@@ -8,10 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { type Chat } from "@/features/chat/types/chat-types";
+import { type Chat, type ChatBody } from "@/features/chat/types/chat-types";
 
 interface ChatHeaderProps {
-  activeChat: Chat;
+  activeChat: ChatBody;
   onEdit?: () => void;
   onDelete?: () => void;
   onShare?: () => void;
@@ -27,7 +27,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       <SidebarTrigger />
 
       <h1 className="text-xl font-semibold text-gray-800">
-        {activeChat.title}
+        {activeChat?.name}
       </h1>
       <span className="ml-3 rounded-full bg-indigo-100 px-2 py-1 text-xs text-primary">
         Active
