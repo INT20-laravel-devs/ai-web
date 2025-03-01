@@ -1,18 +1,19 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useEffect,useRef } from "react";
 import { toast } from "sonner";
 
 import ChatHeader from "@/features/home/components/chat/chat-header";
+import { TypingIndicator } from "@/features/home/components/chat/chat-icons";
 import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
-import MessageInput from "@/features/home/components/message-input";
-import { TypingIndicator } from "@/features/home/components/chat/chat-icons";
-import { useChatStore } from "@/store/use-chat-store";
-import { useDialogs } from "@/hooks/use-dialog";
-import { adaptSetInputMessage } from "@/utils/input-utils";
 import { DeleteDialog } from "@/features/home/components/dialog/delete-dialog";
 import { RenameDialog } from "@/features/home/components/dialog/rename-dialog";
-import { Chat } from "@/types/chat-types";
+import MessageInput from "@/features/home/components/message-input";
+import { useDialogs } from "@/hooks/use-dialog";
+import { useChatStore } from "@/store/use-chat-store";
+import { adaptSetInputMessage } from "@/utils/input-utils";
+
+import { type Chat } from "./types/chat-types";
 
 const ChatPage: React.FC = () => {
   const {
@@ -110,15 +111,11 @@ const ChatPage: React.FC = () => {
 };
 
 // Fixed with proper types
-function findActiveChat(chats: Chat[], activeChatId: string): Chat {
-  return (
-    chats.find((chat) => chat.id === activeChatId) || {
+const findActiveChat = (chats: Chat[], activeChatId: string): Chat => chats.find((chat) => chat.id === activeChatId) ?? {
       id: "",
       title: "",
       lastActive: "",
       messages: [],
-    }
-  );
-}
+    };
 
 export default ChatPage;
