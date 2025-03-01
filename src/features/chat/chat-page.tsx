@@ -5,10 +5,23 @@ import ChatHeader from "@/features/home/components/chat/chat-header";
 import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
 import MessageInput from "@/features/home/components/message-input";
-import TypingIndicator from "@/features/home/components/typing-indicator";
 import { useChatStore } from "@/store/use-chat-store";
 
-const ChatPage = () => {
+import { TypingIndicator } from "../home/components/chat/chat-icons";
+import { type Chat } from "./types/chat-types";
+
+// ChatStore interface to type the store values
+interface ChatStore {
+  chats: Chat[];
+  activeChatId: string | null;
+  inputMessage: string;
+  isTyping: boolean;
+  setInputMessage: (message: string) => void;
+  handleSendMessage: () => void;
+  handleCopyMessage: (messageId: string) => void;
+}
+
+const ChatPage: React.FC = () => {
   const {
     chats,
     activeChatId,
@@ -17,23 +30,20 @@ const ChatPage = () => {
     setInputMessage,
     handleSendMessage,
     handleCopyMessage,
-  } = useChatStore();
+  } = useChatStore() as ChatStore;
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const activeChat = chats.find((chat) => chat.id === activeChatId);
 
-  // Scroll to bottom effect
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat?.messages, isTyping]);
 
   return (
     <div className="flex flex-1 flex-col bg-gray-50">
-      {/* Chat Header */}
       <ChatHeader activeChat={activeChat} />
 
-      {/* Messages Container */}
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
         {activeChat?.messages.length === 0 ? (
           <EmptyChatPlaceholder setInputMessage={setInputMessage} />
@@ -47,13 +57,11 @@ const ChatPage = () => {
           ))
         )}
 
-        {/* Typing indicator */}
         {isTyping && <TypingIndicator />}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
       <MessageInput
         inputMessage={inputMessage}
         setInputMessage={setInputMessage}

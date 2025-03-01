@@ -1,10 +1,19 @@
 import { MessageCircle } from "lucide-react";
+import React from "react";
+
+import { type PromptExample } from "@/features/chat/types/chat-types";
+
+import { promptExamples } from "../../data/mock-data";
 import PromptExampleCard from "./prompt-card";
- import { promptExamples } from "../../data/mock-data";
 
-const EmptyChatPlaceholder = ({ setInputMessage }) => {
+interface EmptyChatPlaceholderProps {
+  setInputMessage: React.Dispatch<React.SetStateAction<string>>;
+}
 
-  const handleExampleClick = (example) => {
+const EmptyChatPlaceholder: React.FC<EmptyChatPlaceholderProps> = ({
+  setInputMessage,
+}) => {
+  const handleExampleClick = (example: PromptExample) => {
     setInputMessage(example.description);
   };
 

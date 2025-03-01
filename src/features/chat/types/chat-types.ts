@@ -11,3 +11,8 @@ export interface Chat {
   lastActive: string;
   messages: Message[];
 }
+
+export interface PromptExample {
+  title: string;
+  description: string;
+}

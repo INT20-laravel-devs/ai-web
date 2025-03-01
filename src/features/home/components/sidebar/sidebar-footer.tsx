@@ -1,6 +1,10 @@
-import { Settings, LogOut } from "lucide-react";
+import { LogOut,Settings } from "lucide-react";
+import React from "react";
 
-const SidebarFooter = ({ isSidebarOpen }) => (
+interface SidebarFooterProps {
+  isSidebarOpen: boolean;
+}
+const SidebarFooter: React.FC<SidebarFooterProps> = ({ isSidebarOpen }) => (
   <div className="border-t border-gray-200 p-4">
     {isSidebarOpen ? (
       <div className="flex items-center justify-between">

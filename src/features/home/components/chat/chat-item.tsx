@@ -1,6 +1,17 @@
 import { MessageCircle, Trash2 } from "lucide-react";
+import React from "react";
 
-const ChatItem = ({
+import { type Chat } from "@/features/chat/types/chat-types";
+
+interface ChatItemProps {
+  chat: Chat;
+  activeChatId: string;
+  setActiveChatId: (id: string) => void;
+  handleDeleteChat: (id: string) => void;
+  isSidebarOpen: boolean;
+}
+
+const ChatItem: React.FC<ChatItemProps> = ({
   chat,
   activeChatId,
   setActiveChatId,
@@ -11,12 +22,12 @@ const ChatItem = ({
     onClick={() => setActiveChatId(chat.id)}
     className={`flex cursor-pointer items-center border-l-4 p-3 transition ${
       activeChatId === chat.id
-        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+        ? "border-primary bg-indigo-50 text-primary"
         : "border-transparent hover:bg-gray-100"
     } `}
   >
     <MessageCircle
-      className={`mr-3 h-5 w-5 ${activeChatId === chat.id ? "text-indigo-600" : "text-gray-500"}`}
+      className={`mr-3 h-5 w-5 ${activeChatId === chat.id ? "text-primary" : "text-gray-500"}`}
     />
     {isSidebarOpen && (
       <div className="min-w-0 flex-1">
@@ -28,7 +39,7 @@ const ChatItem = ({
             </span>
             {chat.id !== "1" && (
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
                   handleDeleteChat(chat.id);
                 }}
@@ -41,8 +52,8 @@ const ChatItem = ({
         </div>
         {chat.messages.length > 0 && (
           <p className="mt-1 truncate text-xs text-gray-500">
-            {chat.messages[chat.messages.length - 1].content.substring(0, 45)}
-            {chat.messages[chat.messages.length - 1].content.length > 45
+            {chat.messages[chat.messages.length - 1]!.content.substring(0, 45)}
+            {chat.messages[chat.messages.length - 1]!.content.length > 45
               ? "..."
               : ""}
           </p>

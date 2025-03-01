@@ -1,6 +1,17 @@
-import { Send, Clock, Check } from "lucide-react";
+import { Check,Clock, Send } from "lucide-react";
+import React from "react";
 
-const MessageInput = ({ inputMessage, setInputMessage, handleSendMessage }) => {
+interface MessageInputProps {
+  inputMessage: string;
+  setInputMessage: React.Dispatch<React.SetStateAction<string>>;
+  handleSendMessage: () => void;
+}
+
+const MessageInput: React.FC<MessageInputProps> = ({
+  inputMessage,
+  setInputMessage,
+  handleSendMessage,
+}) => {
   return (
     <div className="border-t border-gray-200 bg-white p-4">
       <div className="flex items-center space-x-2">
@@ -11,18 +22,17 @@ const MessageInput = ({ inputMessage, setInputMessage, handleSendMessage }) => {
             e.key === "Enter" && !e.shiftKey && handleSendMessage()
           }
           placeholder="Type your message..."
-          className="flex-1 rounded-full border border-gray-300 p-3 text-gray-800 transition duration-300 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 rounded-full border border-gray-300 p-3 text-gray-800 transition duration-300 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <button
           onClick={handleSendMessage}
           disabled={!inputMessage.trim()}
-          className="flex items-center justify-center rounded-full bg-indigo-600 p-3 text-white shadow-sm transition duration-300 hover:bg-indigo-700 hover:shadow disabled:opacity-50 disabled:hover:bg-indigo-600"
+          className="flex items-center justify-center rounded-full bg-primary p-3 text-white shadow-sm transition duration-300 hover:bg-primary hover:shadow disabled:opacity-50 disabled:hover:bg-primary"
         >
           <Send className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Status indicators */}
       <div className="mt-2 flex items-center text-xs text-gray-500">
         <Clock className="mr-1 h-3 w-3" />
         <span>Responses typically in under 5 seconds</span>
@@ -34,4 +44,5 @@ const MessageInput = ({ inputMessage, setInputMessage, handleSendMessage }) => {
     </div>
   );
 };
+
 export default MessageInput;

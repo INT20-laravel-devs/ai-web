@@ -1,18 +1,19 @@
-import { Copy, Sparkles, User } from "lucide-react";
+import { Copy } from "lucide-react";
+import React from "react";
 
-const AiAvatar = () => (
-  <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-    <Sparkles className="w-5 h-5 animate-pulse" />
-  </div>
-);
+import { type Message } from "@/features/chat/types/chat-types";
 
-const UserAvatar = () => (
-  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
-    <User className="h-5 w-5 text-indigo-600" />
-  </div>
-);
+import { AiAvatar, UserAvatar } from "./chat-icons";
 
-const ChatMessage = ({ message, handleCopyMessage }) => (
+interface ChatMessageProps {
+  message: Message;
+  handleCopyMessage: (content: string) => void;
+}
+
+const ChatMessage: React.FC<ChatMessageProps> = ({
+  message,
+  handleCopyMessage,
+}) => (
   <div
     className={`group flex items-start gap-4 ${message.sender === "user" ? "justify-end" : "justify-start"} `}
   >
@@ -22,7 +23,7 @@ const ChatMessage = ({ message, handleCopyMessage }) => (
       <div
         className={`rounded-2xl p-4 shadow-sm ${
           message.sender === "user"
-            ? "rounded-tr-none bg-indigo-600 text-white"
+            ? "rounded-tr-none bg-primary text-white"
             : "rounded-tl-none border border-gray-200 bg-white text-gray-800"
         } `}
       >
