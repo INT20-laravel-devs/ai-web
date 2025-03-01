@@ -3,7 +3,6 @@
 import React from "react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import EditProfileCard from "@/features/profile/components/edit-profile-card";
 import IntegrationsSection from "@/features/profile/components/integrations-section";
 import ProfileCard from "@/features/profile/components/profile-card";
 import useAuthStore from "@/store/use-auth-store";
@@ -18,10 +17,7 @@ const ProfilePage = () => {
           <h2 className="text-xl font-semibold text-gray-800">Profile</h2>
         </div>
       </div>
-      <div className="flex max-h-[500px]">
-        <ProfileCard user={user!} />
-        <EditProfileCard />
-      </div>
+      <ProfileCard user={user!} />
       <IntegrationsSection />
     </div>
   );

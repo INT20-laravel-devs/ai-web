@@ -11,17 +11,20 @@ import {
 import UserAvatar from "@/components/user-avatar";
 import { type User } from "@/features/auth/types/auth-types";
 
+import EditProfileDialog from "./edit-profile-dialog";
+
 type ProfileCardProps = {
   user: User;
-  onEdit?: () => void;
 };
 
-const ProfileCard = ({ user, onEdit }: ProfileCardProps) => {
+const ProfileCard = ({ user }: ProfileCardProps) => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="flex flex-col items-center pb-2 pt-6">
         <UserAvatar image={user?.avatarLink} size={24} className="h-32 w-32" />
-        <h2 className="mt-2 text-2xl font-bold">{user?.username}</h2>
+        <div className="mt-2 flex items-center gap-2">
+          <h2 className="text-2xl font-bold">{user?.username}</h2>
+        </div>
       </CardHeader>
 
       <CardContent className="flex flex-col items-center text-center">
@@ -32,6 +35,9 @@ const ProfileCard = ({ user, onEdit }: ProfileCardProps) => {
       </CardContent>
 
       <CardFooter className="flex justify-between gap-4 pb-6">
+        <Button variant='outline' className="w-full">
+          <EditProfileDialog />
+        </Button>
         <Button variant="destructive" className="w-full">
           Log out
         </Button>
