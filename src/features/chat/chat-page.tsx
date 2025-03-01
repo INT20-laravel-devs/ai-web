@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { type Dispatch, type SetStateAction,useEffect, useRef } from "react";
 
 import ChatHeader from "@/features/home/components/chat/chat-header";
 import ChatMessage from "@/features/home/components/chat/chat-message";
@@ -10,10 +10,9 @@ import { useChatStore } from "@/store/use-chat-store";
 import { TypingIndicator } from "../home/components/chat/chat-icons";
 import { type Chat } from "./types/chat-types";
 
-// ChatStore interface to type the store values
 interface ChatStore {
   chats: Chat[];
-  activeChatId: string | null;
+  activeChatId: string;
   inputMessage: string;
   isTyping: boolean;
   setInputMessage: (message: string) => void;
@@ -21,34 +20,55 @@ interface ChatStore {
   handleCopyMessage: (messageId: string) => void;
 }
 
+const adaptSetInputMessage = (
+  setInputMessage: (message: string) => void,
+): Dispatch<SetStateAction<string>> => {
+  return (value) => {
+    if (typeof value === "function") {
+      const prevValue = useChatStore.getState().inputMessage;
+      setInputMessage(value(prevValue));
+    } else {
+      setInputMessage(value);
+    }
+  };
+};
+
 const ChatPage: React.FC = () => {
   const {
     chats,
     activeChatId,
     inputMessage,
     isTyping,
-    setInputMessage,
+    setInputMessage: storeSetInputMessage,
     handleSendMessage,
     handleCopyMessage,
   } = useChatStore() as ChatStore;
 
+  const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const activeChat = chats.find((chat) => chat.id === activeChatId);
+  const activeChat =
+    chats.find((chat) => chat.id === activeChatId) ??
+    ({
+      id: "",
+      title: "",
+      lastActive: "",
+      messages: [],
+    } as Chat);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeChat?.messages, isTyping]);
+  }, [activeChat.messages, isTyping]);
 
   return (
     <div className="flex flex-1 flex-col bg-gray-50">
       <ChatHeader activeChat={activeChat} />
 
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
-        {activeChat?.messages.length === 0 ? (
+        {activeChat.messages.length === 0 ? (
           <EmptyChatPlaceholder setInputMessage={setInputMessage} />
         ) : (
-          activeChat?.messages.map((message) => (
+          activeChat.messages.map((message) => (
             <ChatMessage
               key={message.id}
               message={message}

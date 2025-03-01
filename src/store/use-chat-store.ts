@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { type Chat } from "@/features/chat/types/chat-types";
+import { type Chat, type Message } from "@/features/chat/types/chat-types";
 import { initialChats } from "@/features/home/data/mock-data";
 
 interface ChatState {
@@ -20,7 +20,12 @@ interface ChatState {
   handleCopyMessage: (content: string) => void;
 }
 
-const getFormattedDateTime = () => {
+interface FormattedDateTime {
+  timeString: string;
+  dateString: string;
+}
+
+const getFormattedDateTime = (): FormattedDateTime => {
   const now = new Date();
   const timeString = now.toLocaleTimeString([], {
     hour: "2-digit",
@@ -37,15 +42,15 @@ export const useChatStore = create<ChatState>((set) => ({
   searchQuery: "",
   isTyping: false,
 
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  setInputMessage: (message) => set({ inputMessage: message }),
+  setSearchQuery: (query: string) => set({ searchQuery: query }),
+  setInputMessage: (message: string) => set({ inputMessage: message }),
   setIsSidebarOpen: () =>
     set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-  setActiveChatId: (chatId) => set({ activeChatId: chatId }),
+  setActiveChatId: (chatId: string) => set({ activeChatId: chatId }),
 
   handleSendMessage: () =>
     set((state) => {
-      if (!state.inputMessage.trim()) return {};
+      if (!state.inputMessage.trim()) return state;
 
       const { timeString, dateString } = getFormattedDateTime();
       const updatedChats = state.chats.map((chat) =>
@@ -60,37 +65,45 @@ export const useChatStore = create<ChatState>((set) => ({
                   content: state.inputMessage,
                   sender: "user",
                   timestamp: `${dateString}, ${timeString}`,
-                },
+                } as Message,
               ],
             }
           : chat,
       );
 
-      setTimeout(() => {
-        set((prevState) => {
-          const { timeString, dateString } = getFormattedDateTime();
-          return {
-            chats: prevState.chats.map((chat) =>
-              chat.id === prevState.activeChatId
-                ? {
-                    ...chat,
-                    lastActive: `${dateString}, ${timeString}`,
-                    messages: [
-                      ...chat.messages,
-                      {
-                        id: `m${Date.now()}`,
-                        content: `I've analyzed your inquiry regarding "${state.inputMessage}". Based on current industry standards and best practices, here's a comprehensive assessment that addresses your specific needs.`,
-                        sender: "ai",
-                        timestamp: `${dateString}, ${timeString}`,
-                      },
-                    ],
-                  }
-                : chat,
-            ),
-            isTyping: false,
-          };
-        });
-      }, 1500);
+      const currentMessage = state.inputMessage;
+      void new Promise<void>((resolve) => {
+        setTimeout(() => {
+          set((prevState) => {
+            const { timeString, dateString } = getFormattedDateTime();
+            return {
+              chats: prevState.chats.map((chat) =>
+                chat.id === prevState.activeChatId
+                  ? {
+                      ...chat,
+                      lastActive: `${dateString}, ${timeString}`,
+                      messages: [
+                        ...chat.messages,
+                        {
+                          id: `m${Date.now()}`,
+                          content: `I've analyzed your inquiry regarding "${currentMessage}". Based on current industry standards and best practices, here's a comprehensive assessment that addresses your specific needs.`,
+                          sender: "ai",
+                          timestamp: `${dateString}, ${timeString}`,
+                        } as Message,
+                      ],
+                    }
+                  : chat,
+              ),
+              isTyping: false,
+            };
+          });
+          resolve();
+        }, 1500);
+      }).catch((error) => {
+        console.error("Error during message handling:", error);
+        // Reset typing state in case of error
+        set({ isTyping: false });
+      });
 
       return { chats: updatedChats, inputMessage: "", isTyping: true };
     }),
@@ -111,9 +124,9 @@ export const useChatStore = create<ChatState>((set) => ({
       };
     }),
 
-  handleDeleteChat: (chatId) =>
+  handleDeleteChat: (chatId: string) =>
     set((state) => {
-      if (state.chats.length <= 1) return {};
+      if (state.chats.length <= 1) return state;
       const updatedChats = state.chats.filter((chat) => chat.id !== chatId);
       return {
         chats: updatedChats,
@@ -124,7 +137,9 @@ export const useChatStore = create<ChatState>((set) => ({
       };
     }),
 
-  handleCopyMessage: (content) => {
-    navigator.clipboard.writeText(content);
+  handleCopyMessage: (content: string) => {
+    void navigator.clipboard.writeText(content).catch((error) => {
+      console.error("Failed to copy to clipboard:", error);
+    });
   },
 }));
