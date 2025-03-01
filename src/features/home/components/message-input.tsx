@@ -32,15 +32,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
           <Send className="h-5 w-5" />
         </button>
       </div>
-
-      <div className="mt-2 flex items-center text-xs text-gray-500">
-        <Clock className="mr-1 h-3 w-3" />
-        <span>Responses typically in under 5 seconds</span>
-        <span className="ml-3 flex items-center">
-          <Check className="mr-1 h-3 w-3 text-green-500" />
-          Secure messaging
-        </span>
-      </div>
     </div>
   );
 };
