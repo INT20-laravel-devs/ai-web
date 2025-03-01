@@ -1,13 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { type User } from "@/features/auth/types/auth-types";
 import { getChats } from "@/features/chat/api/chat-api";
-import { type ChatBody } from "@/features/chat/types/chat-types";
 import ChatItem from "@/features/home/components/chat/chat-item";
-import useAuthStore from "@/store/use-auth-store";
-import { hydrateChatStore } from "@/store/use-chat-store";
+import { hydrateChatStore,useChatStore } from "@/store/use-chat-store";
 
 interface ChatsSectionProps {
   user: User;
@@ -20,23 +18,46 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
     parseAsString.withDefault(""),
   );
 
+  // Get chats from the zustand store
+  const chatsStore = useChatStore((state) => state.chats);
+
   const { data: chats, isLoading } = useQuery({
-    queryKey: ["chats"],
+    queryKey: ["chats", user?.id],
     queryFn: () => getChats(user?.id),
+    enabled: !!user?.id, // Only run the query if user.id exists
   });
 
+  // Hydrate chat store when chats data changes
   useEffect(() => {
-    if (chats || isLoading) return;
-    hydrateChatStore(chats ?? []);
-  }, [chats, isLoading]);
+    if (chats) {
+      hydrateChatStore(chats);
+    }
+  }, [chats]);
 
+  // Filter chats from store based on search query
   const filteredChats = searchQuery
-    ? chats?.filter((chat) => chat.name.includes(searchQuery))
-    : chats;
+    ? chatsStore?.filter((chat) =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : chatsStore;
+
+  if (isLoading && !chatsStore?.length) {
+    return (
+      <div className="py-2 text-sm text-muted-foreground">Loading chats...</div>
+    );
+  }
+
+  if (!filteredChats?.length) {
+    return (
+      <div className="py-2 text-sm text-muted-foreground">
+        {searchQuery ? "No chats match your search" : "No chats found"}
+      </div>
+    );
+  }
 
   return (
     <>
-      {filteredChats?.map((chat) => (
+      {filteredChats.map((chat) => (
         <ChatItem
           key={chat.threadId}
           chat={chat}

@@ -22,8 +22,6 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
   const { user, isLoading } = useAuthStore();
   const { chats, addChat } = useChatStore();
 
-  console.log(chats);
-
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleNewChat = async () => {
