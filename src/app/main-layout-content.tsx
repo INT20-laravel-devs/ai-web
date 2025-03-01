@@ -1,26 +1,31 @@
 "use client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, {
-  type PropsWithChildren,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { type PropsWithChildren, useEffect, useRef } from "react";
 
 import ChatItem from "@/features/home/components/chat/chat-item";
 import SidebarFooter from "@/features/home/components/sidebar/sidebar-footer";
 import SidebarHeader from "@/features/home/components/sidebar/siderbar-header";
-import { initialChats } from "@/features/home/data/mock-data";
+import { useChatStore } from "@/store/use-chat-store";
 
 const MainLayoutContent = ({ children }: PropsWithChildren) => {
-  const [chats, setChats] = useState(initialChats);
-  const [activeChatId, setActiveChatId] = useState("1");
-  const [inputMessage, setInputMessage] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const {
+    chats,
+    activeChatId,
+    inputMessage,
+    isSidebarOpen,
+    searchQuery,
+    isTyping,
+    setSearchQuery,
+    setInputMessage,
+    setIsSidebarOpen,
+    setActiveChatId,
+    handleSendMessage,
+    handleNewChat,
+    handleDeleteChat,
+    handleCopyMessage,
+  } = useChatStore();
 
+  const messagesEndRef = useRef(null);
   const activeChat = chats.find((chat) => chat.id === activeChatId);
   const filteredChats = searchQuery
     ? chats.filter((chat) =>
@@ -28,107 +33,6 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
       )
     : chats;
 
-  // Helper function to get formatted time and date
-  const getFormattedDateTime = () => {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return { timeString, dateString: "Today" };
-  };
-
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
-
-    const { timeString, dateString } = getFormattedDateTime();
-
-    // Add user message
-    const updatedChats = chats.map((chat) =>
-      chat.id === activeChatId
-        ? {
-            ...chat,
-            lastActive: `${dateString}, ${timeString}`,
-            messages: [
-              ...chat.messages,
-              {
-                id: `m${Date.now()}`,
-                content: inputMessage,
-                sender: "user",
-                timestamp: `${dateString}, ${timeString}`,
-              },
-            ],
-          }
-        : chat,
-    );
-
-    // Update chats and clear input
-    setChats(updatedChats);
-    setInputMessage("");
-
-    // Show AI typing indicator
-    setIsTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      setIsTyping(false);
-
-      const { timeString, dateString } = getFormattedDateTime();
-
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === activeChatId
-            ? {
-                ...chat,
-                lastActive: `${dateString}, ${timeString}`,
-                messages: [
-                  ...chat.messages,
-                  {
-                    id: `m${Date.now()}`,
-                    content: `I've analyzed your inquiry regarding "${inputMessage}". Based on current industry standards and best practices, here's a comprehensive assessment that addresses your specific needs.`,
-                    sender: "ai",
-                    timestamp: `${dateString}, ${timeString}`,
-                  },
-                ],
-              }
-            : chat,
-        ),
-      );
-    }, 1500);
-  };
-
-  const handleNewChat = () => {
-    const { timeString } = getFormattedDateTime();
-
-    const newChat = {
-      id: `chat-${Date.now()}`,
-      title: "New Conversation",
-      lastActive: `Today, ${timeString}`,
-      messages: [],
-    };
-
-    setChats([...chats, newChat]);
-    setActiveChatId(newChat.id);
-    setInputMessage("");
-  };
-
-  const handleDeleteChat = (chatId) => {
-    if (chats.length <= 1) return;
-
-    const updatedChats = chats.filter((chat) => chat.id !== chatId);
-    setChats(updatedChats);
-
-    if (chatId === activeChatId) {
-      setActiveChatId(updatedChats[0].id);
-    }
-  };
-
-  const handleCopyMessage = (content) => {
-    navigator.clipboard.writeText(content);
-    // You could add a toast notification here
-  };
-
-  // Scroll to bottom effect
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat?.messages, isTyping]);
@@ -166,7 +70,7 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
 
         {/* Sidebar Toggle */}
         <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={setIsSidebarOpen}
           className="flex justify-center border-t border-gray-200 bg-gray-50 p-3 transition hover:bg-gray-100"
           title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
