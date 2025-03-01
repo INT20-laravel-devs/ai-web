@@ -1,20 +1,7 @@
 import { create } from "zustand";
 
+import { type Chat } from "@/features/chat/types/chat-types";
 import { initialChats } from "@/features/home/data/mock-data";
-
-interface Message {
-  id: string;
-  content: string;
-  sender: "user" | "ai";
-  timestamp: string;
-}
-
-interface Chat {
-  id: string;
-  title: string;
-  lastActive: string;
-  messages: Message[];
-}
 
 interface ChatState {
   chats: Chat[];
@@ -132,7 +119,7 @@ export const useChatStore = create<ChatState>((set) => ({
         chats: updatedChats,
         activeChatId:
           chatId === state.activeChatId
-            ? updatedChats[0].id
+            ? updatedChats[0]?.id
             : state.activeChatId,
       };
     }),

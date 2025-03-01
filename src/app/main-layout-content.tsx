@@ -25,7 +25,7 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     handleCopyMessage,
   } = useChatStore();
 
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const activeChat = chats.find((chat) => chat.id === activeChatId);
   const filteredChats = searchQuery
     ? chats.filter((chat) =>
