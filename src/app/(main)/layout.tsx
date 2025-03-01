@@ -1,9 +1,9 @@
+import { type PropsWithChildren } from "react";
 
-import HomeChat from "@/features/home/home-chat";
+import MainLayoutContent from "@/app/main-layout-content";
 
-const MainLayout = () => {
-  return  <HomeChat />
-    
+const MainLayout = ({ children }: PropsWithChildren) => {
+  return <MainLayoutContent>{children}</MainLayoutContent>;
 };
 
 export default MainLayout;

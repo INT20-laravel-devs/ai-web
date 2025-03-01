@@ -4,7 +4,12 @@ import { type PropsWithChildren, useEffect } from "react";
 
 import { hydrateAuthStore } from "@/store/use-auth-store";
 
-const userMock = null;
+const userMock = {
+  nickname: "Jane Doe",
+  email: "testmail@gmail.com",
+  avatarLink: "https://avatars.dicebear.com/api/avataaars/jane-doe.svg",
+};
+;
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const fetchUser = async () => {

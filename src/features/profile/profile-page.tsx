@@ -8,6 +8,7 @@ import ProfileCompletionCard from "@/features/profile/components/profile-complet
 import SkillsCard from "@/features/profile/components/skills-card";
 
 import { profileData } from "../../../data/profile-data";
+import IntegrationsSection from "@/features/profile/components/integrations-section";
 
 const ProfilePage = () => {
   const {
@@ -25,8 +26,7 @@ const ProfilePage = () => {
   } = profileData;
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-      <div className="space-y-6 md:col-span-1">
+    <div className="grid">
         <ProfileCard
           name={name}
           role={role}
@@ -35,33 +35,8 @@ const ProfilePage = () => {
           stats={stats}
           contactInfo={contactInfo}
         />
+        <IntegrationsSection />
 
-        <ProfileCompletionCard
-          title={profileCompletion.title}
-          progress={profileCompletion.progress}
-        />
-
-        <SkillsCard title={skills.title} skills={skills.list} />
-      </div>
-
-      <div className="space-y-6 md:col-span-2">
-        <LatestActivityCard
-          title={activities.title}
-          viewAllLink={activities.viewAllLink}
-          activities={activities.list}
-        />
-
-        <AboutMeCard
-          title={aboutMe.title}
-          highlightedText={aboutMe.highlightedText}
-          regularText={aboutMe.regularText}
-        />
-
-        <ConnectionsCard
-          title={connections.title}
-          connections={connections.list}
-        />
-      </div>
     </div>
   );
 };
