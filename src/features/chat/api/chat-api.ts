@@ -38,3 +38,23 @@ export const getChats = async (userId: string) => {
     throw e;
   }
 };
+
+export const deleteChat = async (threadId: string) => {
+  try {
+    const response = await fetch(`${API_URL}/chats`, {
+      method: "DELETE",
+      headers: generateAuthHeaders(),
+      body: JSON.stringify({ threadId }),
+    });
+
+    if (!response.ok) {
+      const error: ErrorResponse = await response.json();
+      throw new Error(error.message);
+    }
+
+    return response.ok; // Return success status
+  } catch (e) {
+    console.error("Error deleting chat:", e);
+    throw e;
+  }
+};

@@ -18,20 +18,19 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
     parseAsString.withDefault(""),
   );
 
-  // Get chats from the zustand store
   const chatsStore = useChatStore((state) => state.chats);
 
   const { data: chats, isLoading } = useQuery({
     queryKey: ["chats", user?.id],
     queryFn: () => getChats(user?.id),
-    enabled: !!user?.id, // Only run the query if user.id exists
+    enabled: !!user?.id, 
   });
 
-  // Hydrate chat store when chats data changes
   useEffect(() => {
     if (chats) {
       hydrateChatStore(chats);
     }
+    console.log(chats);
   }, [chats]);
 
   // Filter chats from store based on search query

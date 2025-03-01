@@ -14,6 +14,7 @@ interface SingleChatState {
   handleSendMessage: () => void;
   handleCopyMessage: (content: string) => void;
   addChat: (chat: ChatBody) => void;
+  removeChat: (threadId: string) => void; // New function
 }
 
 interface FormattedDateTime {
@@ -94,7 +95,19 @@ export const useChatStore = create<SingleChatState>((set) => ({
       console.error("Failed to copy to clipboard:", error);
     });
   },
+
   addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
+
+  // New function to remove a chat by threadId
+  removeChat: (threadId) =>
+    set((state) => ({
+      chats: state.chats.filter((chat) => chat.threadId !== threadId),
+      // Clear messages if they belong to the deleted chat
+      messages:
+        state.messages.length > 0 && state.messages[0].threadId === threadId
+          ? []
+          : state.messages,
+    })),
 }));
 
 export const hydrateChatStore = (chats: ChatBody[]) => {

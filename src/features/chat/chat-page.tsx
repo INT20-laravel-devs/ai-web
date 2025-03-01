@@ -4,11 +4,13 @@ import { parseAsString, useQueryState } from "nuqs";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+import { deleteChat } from "@/features/chat/api/chat-api";
 import ChatHeader from "@/features/home/components/chat/chat-header";
 import { TypingIndicator } from "@/features/home/components/chat/chat-icons";
 import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
 import MessageInput from "@/features/home/components/message-input";
+import useAuthStore from "@/store/use-auth-store";
 import { useChatStore } from "@/store/use-chat-store";
 import { adaptSetInputMessage } from "@/utils/input-utils";
 
@@ -17,6 +19,7 @@ const ChatPage: React.FC = () => {
     "threadId",
     parseAsString.withDefault(""),
   );
+  const { user } = useAuthStore();
   const {
     chats,
     messages,
@@ -27,6 +30,7 @@ const ChatPage: React.FC = () => {
     setInputMessage: storeSetInputMessage,
     handleSendMessage,
     handleCopyMessage,
+    removeChat, // New method from store
   } = useChatStore();
 
   const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
@@ -60,15 +64,50 @@ const ChatPage: React.FC = () => {
     });
   };
 
+  const handleDeleteChat = async () => {
+    if (!threadId) {
+      toast.error("Cannot delete chat", {
+        description: "No chat is currently selected.",
+      });
+      return;
+    }
+
+    try {
+      toast.loading("Deleting chat...");
+
+      // Call the delete API with the thread ID
+      await deleteChat(threadId);
+
+      // Update the store to remove the deleted chat
+      removeChat(threadId);
+
+      // Reset thread ID after successful deletion
+      setThreadId("");
+
+      toast.dismiss();
+      toast.success("Chat deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+      toast.dismiss();
+      toast.error("Failed to delete chat", {
+        description: "An error occurred while deleting the chat.",
+      });
+    }
+  };
+
   const activeChat = chats.find((chat) => chat.threadId === threadId);
 
   return (
     <div className="flex h-full flex-col">
-      <ChatHeader activeChat={activeChat} onShare={handleShare} />
+      <ChatHeader
+        activeChat={activeChat}
+        onShare={handleShare}
+        onDelete={handleDeleteChat}
+      />
 
       <div className="flex-1 overflow-auto p-4">
         {messages.length === 0 ? (
-          <EmptyChatPlaceholder setInputMessage={() => {}} />
+          <EmptyChatPlaceholder setInputMessage={setInputMessage} />
         ) : (
           <div className="space-y-4">
             {messages.map((message, index) => (
