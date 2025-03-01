@@ -48,13 +48,12 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     <div className="flex h-screen w-full overflow-hidden bg-gray-50">
       <Sidebar className="border-r border-gray-200 bg-white shadow-md">
         <SidebarHeader
-          isSidebarOpen={isSidebarOpen}
           handleNewChat={handleNewChat}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
 
-        <SidebarContent className="flex-1">
+        <SidebarContent className="flex-1 gap-0">
           {filteredChats.map((chat) => (
             <ChatItem
               key={chat.id}

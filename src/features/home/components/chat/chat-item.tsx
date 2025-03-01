@@ -67,12 +67,12 @@ const ChatItem: React.FC<ChatItemProps> = ({
           <div className="min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center justify-between gap-1">
               <span className="truncate text-sm font-medium">{chat.title}</span>
-              <span className="whitespace-nowrap text-xs text-gray-500">
+              <span className="whitespace-nowrap text-xs font-medium text-gray-500">
                 {chat.lastActive}
               </span>
             </div>
             {chat.messages.length > 0 && (
-              <p className="mt-1 truncate text-xs text-gray-500">
+              <p className="mt-1 truncate text-xs font-medium text-gray-500">
                 {chat.messages[chat.messages.length - 1]!.content.substring(
                   0,
                   isMobile ? 25 : 45,
