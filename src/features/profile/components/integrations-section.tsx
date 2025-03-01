@@ -1,106 +1,139 @@
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {PlusCircle} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Badge} from "@/components/ui/badge";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {
+  ArrowRight,
+  BarChart3,
+  FileText,
+  PlusCircle,
+  Settings,
+  Wand2,
+} from "lucide-react";
+import { useState } from "react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const IntegrationsSection = () => {
-  return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Integrations</h2>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Connected Integration */}
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">FACE Advisor</CardTitle>
-              <Badge>Connected</Badge>
-            </div>
-            <CardDescription>Financial Advice and Consultation Expert</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="FACE Advisor"/>
-                <AvatarFallback>FA</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">AI Financial Expert</p>
-                <p className="text-sm text-muted-foreground">Powered by GPT-4</p>
-              </div>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <p>Get personalized financial advice, investment strategies, and budget planning assistance.</p>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" className="w-full">
-              Configure
-            </Button>
-          </CardFooter>
-        </Card>
+  const [integrations, setIntegrations] = useState([
+    {
+      id: 1,
+      title: "FICE Advisor",
+      description: "Faculty of Informatics and Computer Engineering",
+      provider: "AI Researcher Expert",
+      poweredBy: "GPT-4",
+      details:
+        "Get personalized financial advice, investment strategies, and budget planning assistance.",
+      connected: true,
+      icon: <Settings className="h-4 w-4" />,
+      initials: "FA",
+    },
+    {
+      id: 2,
+      title: "Document Analysis",
+      description: "Extract insights from your documents",
+      provider: "AI Document Analysis",
+      poweredBy: "GPT-4 Vision",
+      details:
+        "Upload documents and get summaries, insights, and answers to your questions.",
+      connected: false,
+      icon: <FileText className="h-4 w-4" />,
+      initials: "DA",
+      comingSoon: true,
+    },
+  ]);
 
-        {/* Available Integrations */}
-        {["Document Analysis", "Creative Assistant", "Data Visualization"].map((integration, i) => (
-          <Card key={integration} className="bg-muted/40">
+  const handleConnect = (id) => {
+    setIntegrations(
+      integrations.map((integration) =>
+        integration.id === id
+          ? { ...integration, connected: !integration.connected }
+          : integration,
+      ),
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-800">Integrations</h2>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {integrations.map((integration) => (
+          <Card
+            key={integration.id}
+            className={`transition-all duration-200 ${
+              !integration.connected && !integration.comingSoon
+                ? "bg-muted/40 hover:bg-background hover:shadow-md"
+                : ""
+            } ${integration.comingSoon ? "border-dashed opacity-75" : ""}`}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">{integration}</CardTitle>
-              <CardDescription>
-                {i === 0
-                  ? "Extract insights from your documents"
-                  : i === 1
-                    ? "Generate creative content and ideas"
-                    : "Visualize your data with AI assistance"}
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">{integration.title}</CardTitle>
+                {integration.connected && <Badge>Connected</Badge>}
+                {integration.comingSoon && (
+                  <Badge variant="outline">Coming Soon</Badge>
+                )}
+              </div>
+              <CardDescription>{integration.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4 flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={`/placeholder.svg?height=40&width=40&text=${i + 1}`} alt={integration}/>
-                  <AvatarFallback>{integration.substring(0, 2)}</AvatarFallback>
+                  <AvatarImage
+                    src={`/api/placeholder/40/40?text=${integration.initials}`}
+                    alt={integration.title}
+                  />
+                  <AvatarFallback>{integration.initials}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">AI {integration}</p>
+                  <p className="font-medium">{integration.provider}</p>
                   <p className="text-sm text-muted-foreground">
-                    {i === 0 ? "Powered by GPT-4 Vision" : i === 1 ? "Powered by DALL-E 3" : "Powered by GPT-4 & D3.js"}
+                    Powered by {integration.poweredBy}
                   </p>
                 </div>
               </div>
               <div className="text-sm text-muted-foreground">
-                <p>
-                  {i === 0
-                    ? "Upload documents and get summaries, insights, and answers to your questions."
-                    : i === 1
-                      ? "Generate creative text, images, and ideas for your projects and content."
-                      : "Turn your data into beautiful, interactive visualizations with AI assistance."}
-                </p>
+                <p>{integration.details}</p>
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">
-                <PlusCircle className="mr-2 h-4 w-4"/>
-                Connect
-              </Button>
+              {integration.connected ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleConnect(integration.id)}
+                >
+                  Configure {integration.icon}
+                </Button>
+              ) : integration.comingSoon ? (
+                <Button disabled className="w-full">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Coming Soon
+                </Button>
+              ) : (
+                <Button
+                  className="w-full"
+                  onClick={() => handleConnect(integration.id)}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Connect
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}
-
-        {/* Add More Card */}
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center h-full py-8">
-            <div className="rounded-full bg-muted p-3 mb-4">
-              <PlusCircle className="h-6 w-6 text-muted-foreground"/>
-            </div>
-            <h3 className="text-lg font-medium mb-1">Add Integration</h3>
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              Browse the marketplace for more AI integrations
-            </p>
-            <Button variant="outline">Explore Marketplace</Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
-  )
+  );
 };
 
 export default IntegrationsSection;
