@@ -11,7 +11,7 @@ interface UserAvatarProps {
 const UserAvatar = ({ image, className, size = 16 }: UserAvatarProps) => {
   return (
     <Avatar className={className}>
-      <AvatarImage src={image!} />
+      <AvatarImage src={image ?? ""} alt="alt" />
       <AvatarFallback>
         <UserRound size={size} className="opacity-60" aria-hidden="true" />
       </AvatarFallback>

@@ -1,46 +1,48 @@
-import { LogOut,Settings } from "lucide-react";
+"use client";
+import { LogOut, Settings } from "lucide-react";
+import Link from "next/link";
 import React from "react";
+
+import { buttonVariants } from "@/components/ui/button";
+import { SidebarFooter as Footer, useSidebar } from "@/components/ui/sidebar";
+import UserAvatar from "@/components/user-avatar";
+import { Routes } from "@/constants/navigation";
+import useAuthStore from "@/store/use-auth-store";
 
 interface SidebarFooterProps {
   isSidebarOpen: boolean;
 }
-const SidebarFooter: React.FC<SidebarFooterProps> = ({ isSidebarOpen }) => (
-  <div className="border-t border-gray-200 p-4">
-    {isSidebarOpen ? (
+
+const SidebarFooter: React.FC<SidebarFooterProps> = ({ isSidebarOpen }) => {
+  const { user } = useAuthStore();
+  const { state } = useSidebar();
+  const isExpanded = state === "expanded";
+
+  return (
+    <Footer className="border-t border-gray-200 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">
-            U
-          </div>
-          <div className="text-sm">
-            <p className="font-medium text-gray-900">User Account</p>
-            <p className="text-xs text-gray-500">Professional Plan</p>
-          </div>
+          <UserAvatar image={user?.avatarLink} />
+          {isExpanded && (
+            <div className="text-sm">
+              <p className="font-medium text-gray-900">{user?.username}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
+            </div>
+          )}
         </div>
-        <div className="flex space-x-1">
-          <button
-            className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
-            title="Settings"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
-          <button
-            className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
-            title="Sign Out"
-          >
-            <LogOut className="h-5 w-5" />
-          </button>
-        </div>
+        {isExpanded && (
+          <div className="flex space-x-1">
+            <Link
+              href={Routes.Profile}
+              className={buttonVariants({ variant: "ghost", size: "icon" })}
+            >
+              <Settings className="h-6 w-6" />
+            </Link>
+          </div>
+        )}
       </div>
-    ) : (
-      <button
-        className="flex w-full justify-center rounded-full p-2 transition hover:bg-gray-100"
-        title="Settings"
-      >
-        <Settings className="h-6 w-6 text-gray-700" />
-      </button>
-    )}
-  </div>
-);
+    </Footer>
+  );
+};
 
 export default SidebarFooter;

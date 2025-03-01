@@ -1,88 +1,47 @@
-import Image from "next/image";
-import Link from "next/link";
-import type React from "react";
+import { Mail } from "lucide-react";
+import React from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import UserAvatar from "@/components/user-avatar";
-
-type ContactItem = {
-  icon: React.ReactNode;
-  content: string;
-  isLink?: boolean;
-  href?: string;
-};
-
-type Stat = {
-  value: string | number;
-  label: string;
-};
+import { type User } from "@/features/auth/types/auth-types";
 
 type ProfileCardProps = {
-  name: string;
-  role: string;
-  avatar: string;
-  badge?: string;
-  stats: Stat[];
-  contactInfo: ContactItem[];
+  user: User;
+  onEdit?: () => void;
 };
 
-const ProfileCard = ({
-  name,
-  role,
-  avatar,
-  badge,
-  stats,
-  contactInfo,
-}: ProfileCardProps) => (
-  <Card>
-    <CardContent className="pt-6">
-      <div className="relative mb-2">
-        {badge && (
-          <Badge
-            className="absolute -left-2 -top-2 bg-black text-white hover:bg-black/90"
-            variant="secondary"
-          >
-            {badge}
-          </Badge>
-        )}
-        <div className="flex flex-col items-center">
-          <div>
-            <UserAvatar size={24} image={avatar} className="h-24 w-24" />
-          </div>
-          <h1 className="text-2xl font-bold">{name}</h1>
-          <p className="text-muted-foreground">{role}</p>
+const ProfileCard = ({ user, onEdit }: ProfileCardProps) => {
+  return (
+    <Card className="w-full max-w-md bg-white shadow-lg dark:bg-gray-800">
+      <CardHeader className="flex flex-col items-center pb-2 pt-6">
+        <UserAvatar image={user?.avatarLink} size={24} className="h-32 w-32" />
+        <h2 className="mt-2 text-2xl font-bold">{user?.username}</h2>
+      </CardHeader>
+
+      <CardContent className="flex flex-col items-center text-center">
+        <div className="mb-2 flex items-center text-gray-600 dark:text-gray-400">
+          <Mail className="mr-2 h-4 w-4" />
+          <span>{user?.email}</span>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="my-6 grid grid-cols-3 gap-4 border-y py-6 text-center">
-        {stats.map((stat, index) => (
-          <div key={index}>
-            <p className="text-xl font-bold">{stat.value}</p>
-            <p className="text-muted-foreground text-sm">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        {contactInfo.map((item, index) => (
-          <div key={index} className="flex items-center gap-3">
-            {item.icon}
-            {item.isLink ? (
-              <Link
-                href={item.href || "#"}
-                className="text-primary hover:underline"
-              >
-                {item.content}
-              </Link>
-            ) : (
-              <span>{item.content}</span>
-            )}
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+      <CardFooter className="flex justify-between gap-4 pb-6">
+        <Button variant="outline" onClick={onEdit} className="w-full">
+          Edit Profile
+        </Button>
+        <Button variant="destructive" className="w-full">
+          Log out
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
 
 export default ProfileCard;

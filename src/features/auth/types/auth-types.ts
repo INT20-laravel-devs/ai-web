@@ -27,7 +27,7 @@ export type UserRole = "PLAYER" | "ADMIN";
 export interface User {
   id: string;
   email: string;
-  nickname: string;
+  username: string;
   role: UserRole;
   avatarLink: string | null;
 }

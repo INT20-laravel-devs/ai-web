@@ -1,5 +1,10 @@
 "use client";
-import React, { type Dispatch, type SetStateAction,useEffect, useRef } from "react";
+import React, {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useRef,
+} from "react";
 
 import ChatHeader from "@/features/home/components/chat/chat-header";
 import ChatMessage from "@/features/home/components/chat/chat-message";
@@ -42,7 +47,7 @@ const ChatPage: React.FC = () => {
     setInputMessage: storeSetInputMessage,
     handleSendMessage,
     handleCopyMessage,
-  } = useChatStore() as ChatStore;
+  } = useChatStore();
 
   const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -61,7 +66,7 @@ const ChatPage: React.FC = () => {
   }, [activeChat.messages, isTyping]);
 
   return (
-    <div className="flex flex-1 flex-col bg-gray-50">
+    <div className="w-full flex-1 bg-gray-50">
       <ChatHeader activeChat={activeChat} />
 
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
