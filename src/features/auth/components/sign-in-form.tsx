@@ -20,7 +20,7 @@ interface SignInFormProps {
 }
 
 const SignInForm = ({ className }: SignInFormProps) => {
-  const { replace } = useRouter();
+  const { replace, push } = useRouter();
   const {
     register,
     handleSubmit,
@@ -33,7 +33,8 @@ const SignInForm = ({ className }: SignInFormProps) => {
     try {
       await signIn(data);
       toast.success("Logged in successfully");
-      replace(Routes.Home);
+      // replace(Routes.Home);
+      push('/chat')
     } catch (e) {
       if (e instanceof Error) toast.error(e.message);
       console.error(e);

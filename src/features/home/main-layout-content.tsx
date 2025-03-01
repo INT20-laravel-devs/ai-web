@@ -39,10 +39,10 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChatId]);
 
-  // if (!user && !isLoading) {
-  //   push(Routes.SignIn);
-  //   return null;
-  // }
+  if (!user && !isLoading) {
+    push(Routes.SignIn);
+    return null;
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50">

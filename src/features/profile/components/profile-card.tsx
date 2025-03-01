@@ -1,4 +1,5 @@
 import { Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,14 @@ type ProfileCardProps = {
 };
 
 const ProfileCard = ({ user }: ProfileCardProps) => {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/auth/sign-in");
+    
+  };
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="flex flex-col items-center pb-2 pt-6">
@@ -35,10 +44,14 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
       </CardContent>
 
       <CardFooter className="flex justify-between gap-4 pb-6">
-        <Button variant='outline' className="w-full">
+        <Button variant="outline" className="w-full">
           <EditProfileDialog />
         </Button>
-        <Button variant="destructive" className="w-full">
+        <Button
+          variant="destructive"
+          className="w-full"
+          onClick={handleLogout}
+        >
           Log out
         </Button>
       </CardFooter>
