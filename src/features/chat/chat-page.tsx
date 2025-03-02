@@ -12,6 +12,7 @@ import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
 import MessageInput from "@/features/home/components/message-input";
 import { socket } from "@/lib/socket";
+import useAuthStore from "@/store/use-auth-store";
 import { useChatStore } from "@/store/use-chat-store";
 import { adaptSetInputMessage } from "@/utils/input-utils";
 
@@ -30,7 +31,7 @@ const getFormattedDateTime = (): FormattedDateTime => {
 };
 
 const ChatPage: React.FC = () => {
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
   const [threadId, setThreadId] = useQueryState(
     "threadId",
     parseAsString.withDefault(""),

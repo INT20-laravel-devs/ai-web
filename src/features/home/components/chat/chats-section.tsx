@@ -49,7 +49,7 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
 
   if (!filteredChats?.length) {
     return (
-      <div className="py-2 text-sm text-muted-foreground">
+      <div className="py-2 pl-3 text-sm text-muted-foreground">
         {searchQuery ? "No chats match your search" : "No chats found"}
       </div>
     );
