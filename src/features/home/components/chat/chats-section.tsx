@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 import { type User } from "@/features/auth/types/auth-types";
 import { getChats } from "@/features/chat/api/chat-api";
 import ChatItem from "@/features/home/components/chat/chat-item";
-import { hydrateChatStore,useChatStore } from "@/store/use-chat-store";
+import { hydrateChatStore, useChatStore } from "@/store/use-chat-store";
 
 interface ChatsSectionProps {
   user: User;
@@ -20,13 +20,12 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
   );
   const { push } = useRouter();
 
-
   const chatsStore = useChatStore((state) => state.chats);
 
   const { data: chats, isLoading } = useQuery({
     queryKey: ["chats", user?.id],
     queryFn: () => getChats(user?.id),
-    enabled: !!user?.id, 
+    enabled: !!user?.id,
   });
 
   useEffect(() => {
@@ -58,13 +57,14 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
 
   return (
     <>
-      {filteredChats.map((chat) => (
+      {filteredChats.map((chat, index) => (
         <div
           key={chat.threadId}
           onClick={() => push(`/chat?threadId=${chat.threadId}`)}
         >
           <ChatItem
             chat={chat}
+            chatIndex={index + 1}
             activeChatId={threadId}
             setActiveChatId={setThreadId}
           />

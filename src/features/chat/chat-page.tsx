@@ -12,7 +12,6 @@ import ChatMessage from "@/features/home/components/chat/chat-message";
 import EmptyChatPlaceholder from "@/features/home/components/chat/chat-placeholder";
 import MessageInput from "@/features/home/components/message-input";
 import { socket } from "@/lib/socket";
-import useAuthStore from "@/store/use-auth-store";
 import { useChatStore } from "@/store/use-chat-store";
 import { adaptSetInputMessage } from "@/utils/input-utils";
 
@@ -53,16 +52,12 @@ const ChatPage: React.FC = () => {
   const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize socket listeners
   useEffect(() => {
-    // Listen for incoming messages
     const handleIncomingMessage = (message: Message) => {
-      console.log("Incoming message", message);
       addMessage(message);
       setIsTyping(false);
     };
 
-    // Listen for chat history when joining
     const handleJoinRoom = (chatInfo: Chat) => {
       setMessages(chatInfo.messages);
     };
@@ -70,7 +65,6 @@ const ChatPage: React.FC = () => {
     socket.on("message", handleIncomingMessage);
     socket.on("join", handleJoinRoom);
 
-    // Cleanup socket listeners
     return () => {
       socket.off("message", handleIncomingMessage);
       socket.off("join", handleJoinRoom);
@@ -81,21 +75,17 @@ const ChatPage: React.FC = () => {
     };
   }, [activeThreadId, addMessage, setIsTyping, setMessages]);
 
-  // Join the room specified in the URL query parameter
   useEffect(() => {
     if (threadId && threadId !== activeThreadId) {
-      // Leave current room if needed
       if (activeThreadId) {
         socket.emit("leave", { threadId: activeThreadId });
       }
 
-      // Join new room
       socket.emit("join", { threadId });
       setActiveThreadId(threadId);
     }
   }, [threadId, activeThreadId, setActiveThreadId]);
 
-  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
@@ -111,12 +101,10 @@ const ChatPage: React.FC = () => {
       timestamp: `${dateString}, ${timeString}`,
     };
 
-    // Send message to server via socket
     socket.emit("message", messageData);
 
     addMessage(messageData);
 
-    // Reset input and set typing state
     setInputMessage("");
     setIsTyping(true);
   };
@@ -148,13 +136,10 @@ const ChatPage: React.FC = () => {
     try {
       toast.loading("Deleting chat...");
 
-      // Call the delete API with the thread ID
       await deleteChat(threadId);
 
-      // Update the store to remove the deleted chat
       removeChat(threadId);
 
-      // Reset thread ID after successful deletion
       await setThreadId("");
 
       toast.dismiss();
@@ -169,8 +154,6 @@ const ChatPage: React.FC = () => {
   };
 
   const activeChat = chats.find((chat) => chat.threadId === threadId);
-
-  console.log(JSON.stringify(messages));
 
   return (
     <div className="flex h-full flex-col">
