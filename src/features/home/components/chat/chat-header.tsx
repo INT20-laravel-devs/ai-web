@@ -1,4 +1,5 @@
 import { Edit, MoreHorizontal, Share2, Trash2 } from "lucide-react";
+import Image from "next/image";
 import React from "react";
 
 import {
@@ -26,11 +27,15 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     <div className="flex items-center">
       <SidebarTrigger />
 
-      <h1 className="text-xl font-semibold text-gray-800">
-        {activeChat?.name}
-      </h1>
+      <Image
+        src="/icons/favicon.ico"
+        alt="FICE advisor logo"
+        className="ml-3"
+        width={24}
+        height={24}
+      />
       <span className="ml-3 rounded-full bg-indigo-100 px-2 py-1 text-xs text-primary">
-        Active
+        FICE Advisor
       </span>
     </div>
     <div className="flex items-center space-x-2">

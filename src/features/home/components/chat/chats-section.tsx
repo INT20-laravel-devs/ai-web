@@ -21,6 +21,7 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
   const { push } = useRouter();
 
   const chatsStore = useChatStore((state) => state.chats);
+  const setActiveThreadId = useChatStore((state) => state.setActiveThreadId);
 
   const { data: chats, isLoading } = useQuery({
     queryKey: ["chats", user?.id],
@@ -33,6 +34,10 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
       hydrateChatStore(chats);
     }
   }, [chats]);
+
+  useEffect(() => {
+    setActiveThreadId(threadId);
+  }, [threadId]);
 
   // Filter chats from store based on search query
   const filteredChats = searchQuery
