@@ -6,8 +6,8 @@ export interface Message {
 export interface Chat {
   threadId: string;
   userId: string;
-  name: any;
-  description: any;
+  name?: string;
+  description?: string;
   createdAt: string;
   updatedAt: string;
   messages: Message[];

@@ -1,52 +1,34 @@
 "use client";
 import { MessageCircle } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
 
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { SidebarMenuItem } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
-import type { Chat, ChatBody } from "@/features/chat/types/chat-types";
-
-const useWindowSize = () => {
-  const [windowSize, setWindowSize] = useState({
-    width: typeof window !== "undefined" ? window.innerWidth : 0,
-    height: typeof window !== "undefined" ? window.innerHeight : 0,
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return windowSize;
-};
+import { type ChatBody } from "@/features/chat/types/chat-types";
 
 interface ChatItemProps {
   chat: ChatBody;
+  chatIndex: number;
   activeChatId: string;
   setActiveChatId: (id: string) => void;
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({
   chat,
+  chatIndex,
   activeChatId,
   setActiveChatId,
 }) => {
   const { state } = useSidebar();
   const isExpanded = state === "expanded";
   const isActive = activeChatId === chat.threadId;
-  const { width } = useWindowSize();
-  const isMobile = width < 640;
+
+  const date = new Date(chat.updatedAt);
+  const formattedDate = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <SidebarMenuItem className="list-none">
@@ -66,23 +48,13 @@ const ChatItem: React.FC<ChatItemProps> = ({
         {isExpanded && (
           <div className="min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center justify-between gap-1">
-              <span className="truncate text-sm font-medium">{chat.name}</span>
+              <span className="truncate text-sm font-medium">
+                Chat {chatIndex}
+              </span>
               <span className="whitespace-nowrap text-xs font-medium text-gray-500">
-                {chat.updatedAt}
+                {formattedDate}
               </span>
             </div>
-            {/*{chat.messages.length > 0 && (*/}
-            {/*  <p className="mt-1 truncate text-xs font-medium text-gray-500">*/}
-            {/*    {chat.messages[chat.messages.length - 1]!.content.substring(*/}
-            {/*      0,*/}
-            {/*      isMobile ? 25 : 45,*/}
-            {/*    )}*/}
-            {/*    {chat.messages[chat.messages.length - 1]!.content.length >*/}
-            {/*    (isMobile ? 25 : 45)*/}
-            {/*      ? "..."*/}
-            {/*      : ""}*/}
-            {/*  </p>*/}
-            {/*)}*/}
           </div>
         )}
       </SidebarMenuButton>
