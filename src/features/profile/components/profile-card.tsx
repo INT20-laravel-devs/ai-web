@@ -52,7 +52,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
           className="w-full"
           onClick={handleLogout}
         >
-          Log out
+          Вийти
         </Button>
       </CardFooter>
     </Card>

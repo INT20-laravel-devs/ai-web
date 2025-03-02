@@ -32,7 +32,6 @@ const EditProfileDialog = () => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Handle avatar update
       if (avatarFile) {
         const formData = new FormData();
         formData.append("file", avatarFile);
@@ -40,12 +39,10 @@ const EditProfileDialog = () => {
         await updateAvatar(formData);
       }
 
-      // Handle profile update
       if (user?.username !== editUser.username) {
         await updateProfile(user!.id, editUser.username);
       }
 
-      // Update local state
       hydrateAuthStore(editUser);
       setOpen(false);
     } catch (error) {
@@ -93,11 +90,11 @@ const EditProfileDialog = () => {
       }}
     >
       <DialogTrigger asChild>
-        <span className="text-black">Edit Profile</span>
+        <span className="text-black">Налаштування</span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Налаштування</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div
@@ -112,20 +109,20 @@ const EditProfileDialog = () => {
             />
             {isDragActive ? (
               <p className="mt-2 text-sm text-muted-foreground">
-                Drop the image here ...
+                Скиньте зображення сюди ...
               </p>
             ) : (
               <p className="mt-2 text-sm text-muted-foreground">
-                Drag and drop an image here, or click to select one
+                Перетягніть зображення сюди або клацніть, щоб вибрати його
               </p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Емейл</Label>
             <Input id="email" value={editUser?.email} disabled />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Ім&apos;я користувача</Label>
             <Input
               id="username"
               name="username"
@@ -140,7 +137,7 @@ const EditProfileDialog = () => {
             onClick={() => setOpen(false)}
             disabled={isLoading}
           >
-            Cancel
+            Скасувати
           </Button>
           <Button onClick={handleSave} disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
