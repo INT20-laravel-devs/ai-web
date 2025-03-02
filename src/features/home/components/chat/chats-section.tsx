@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { type User } from "@/features/auth/types/auth-types";
 import { getChats } from "@/features/chat/api/chat-api";
@@ -17,6 +18,8 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
     "threadId",
     parseAsString.withDefault(""),
   );
+  const { push } = useRouter();
+
 
   const chatsStore = useChatStore((state) => state.chats);
 
@@ -30,7 +33,6 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
     if (chats) {
       hydrateChatStore(chats);
     }
-    console.log(chats);
   }, [chats]);
 
   // Filter chats from store based on search query
@@ -57,12 +59,16 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
   return (
     <>
       {filteredChats.map((chat) => (
-        <ChatItem
+        <div
           key={chat.threadId}
-          chat={chat}
-          activeChatId={threadId}
-          setActiveChatId={setThreadId}
-        />
+          onClick={() => push(`/chat?threadId=${chat.threadId}`)}
+        >
+          <ChatItem
+            chat={chat}
+            activeChatId={threadId}
+            setActiveChatId={setThreadId}
+          />
+        </div>
       ))}
     </>
   );
