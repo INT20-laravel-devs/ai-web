@@ -9,7 +9,7 @@ RUN npm install -g pnpm && \
 
 COPY . .
 
-RUN SKIP_ENV_VALIDATION=true pnpm build
+RUN pnpm build
 
 EXPOSE 3000
 
