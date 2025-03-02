@@ -31,6 +31,7 @@ const getFormattedDateTime = (): FormattedDateTime => {
 };
 
 const ChatPage: React.FC = () => {
+  const { user } = useAuthStore()
   const [threadId, setThreadId] = useQueryState(
     "threadId",
     parseAsString.withDefault(""),
@@ -108,6 +109,7 @@ const ChatPage: React.FC = () => {
     const messageData = {
       content: inputMessage,
       threadId: activeThreadId,
+      userId: user?.id,
       timestamp: `${dateString}, ${timeString}`,
     };
 

@@ -19,6 +19,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { loginFiceAdvisor } from "../api/integrations";
 
 const IntegrationsSection = () => {
   const [integrations, setIntegrations] = useState([
@@ -30,7 +42,7 @@ const IntegrationsSection = () => {
       poweredBy: "GPT-4",
       details:
         "Get personalized financial advice, investment strategies, and budget planning assistance.",
-      connected: true,
+      connected: false,
       icon: <Settings className="h-4 w-4" />,
       initials: "FA",
     },
@@ -49,14 +61,70 @@ const IntegrationsSection = () => {
     },
   ]);
 
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [currentIntegrationId, setCurrentIntegrationId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // Clear any previous error messages when user starts typing
+    if (loginError) setLoginError("");
+  };
+
   const handleConnect = (id) => {
-    setIntegrations(
-      integrations.map((integration) =>
-        integration.id === id
-          ? { ...integration, connected: !integration.connected }
-          : integration,
-      ),
-    );
+    // If already connected, toggle the connection off
+    const integration = integrations.find((i) => i.id === id);
+    if (integration.connected) {
+      setIntegrations(
+        integrations.map((integration) =>
+          integration.id === id
+            ? { ...integration, connected: false }
+            : integration,
+        ),
+      );
+      return;
+    }
+
+    // If not connected, open the login dialog
+    setCurrentIntegrationId(id);
+    setLoginDialogOpen(true);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setLoginError("");
+
+    try {
+      // Call the FICE Advisor login API
+      await loginFiceAdvisor(loginData.email, loginData.password);
+
+      // Update the connection status if login successful
+      setIntegrations(
+        integrations.map((integration) =>
+          integration.id === currentIntegrationId
+            ? { ...integration, connected: true }
+            : integration,
+        ),
+      );
+
+      // Close dialog and reset form
+      setLoginDialogOpen(false);
+      setLoginData({ email: "", password: "" });
+    } catch (error) {
+      // Display error message
+      setLoginError(
+        error.message || "Failed to connect. Please check your credentials.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -132,6 +200,74 @@ const IntegrationsSection = () => {
           </Card>
         ))}
       </div>
+
+      {/* FICE Advisor Login Dialog */}
+      <Dialog
+        open={loginDialogOpen}
+        onOpenChange={(open) => {
+          setLoginDialogOpen(open);
+          if (!open) {
+            setLoginError("");
+            setLoginData({ email: "", password: "" });
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Connect to FICE Advisor</DialogTitle>
+            <DialogDescription>
+              Enter your credentials to connect to the FICE Advisor integration.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleLogin}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={loginData.email}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={loginData.password}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {loginError && (
+                <div className="text-sm font-medium text-red-500">
+                  {loginError}
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLoginDialogOpen(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Connecting..." : "Connect"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
