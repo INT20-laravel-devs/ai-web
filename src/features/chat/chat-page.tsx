@@ -4,7 +4,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-import { deleteChat } from "@/features/chat/api/chat-api";
+import { createChat, deleteChat } from "@/features/chat/api/chat-api";
 import { type Chat, type Message } from "@/features/chat/types/chat-types";
 import ChatHeader from "@/features/home/components/chat/chat-header";
 import { TypingIndicator } from "@/features/home/components/chat/chat-icons";
@@ -49,6 +49,7 @@ const ChatPage: React.FC = () => {
     setIsTyping,
     handleCopyMessage,
     removeChat,
+    addChat,
   } = useChatStore();
 
   const setInputMessage = adaptSetInputMessage(storeSetInputMessage);
@@ -92,8 +93,20 @@ const ChatPage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim() || !activeThreadId) return;
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    if (!threadId || !activeThreadId) {
+      try {
+        const chatBody = await createChat();
+        await setThreadId(chatBody.threadId);
+        setActiveThreadId(chatBody.threadId);
+        addChat(chatBody);
+      } catch {
+        toast.error("Не вдалося створити чат");
+        return;
+      }
+    }
 
     const { timeString, dateString } = getFormattedDateTime();
 

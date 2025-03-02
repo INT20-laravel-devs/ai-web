@@ -39,12 +39,18 @@ const ChatsSection = ({ user, searchQuery }: ChatsSectionProps) => {
     setActiveThreadId(threadId);
   }, [threadId]);
 
-  // Filter chats from store based on search query
+  const sortedChats = chatsStore
+    ?.slice()
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+
   const filteredChats = searchQuery
-    ? chatsStore?.filter((chat) =>
+    ? sortedChats?.filter((chat) =>
         chat.name.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-    : chatsStore;
+    : sortedChats;
 
   if (isLoading && !chatsStore?.length) {
     return (

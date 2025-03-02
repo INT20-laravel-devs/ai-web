@@ -18,9 +18,8 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     "threadId",
     parseAsString.withDefault(""),
   );
-  const { push } = useRouter();
-  const { user, isLoading } = useAuthStore();
-  const { chats, addChat } = useChatStore();
+  const { user } = useAuthStore();
+  const { addChat } = useChatStore();
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 

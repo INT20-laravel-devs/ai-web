@@ -20,7 +20,7 @@ interface SignInFormProps {
 }
 
 const SignInForm = ({ className }: SignInFormProps) => {
-  const { replace, push } = useRouter();
+  const { replace } = useRouter();
   const {
     register,
     handleSubmit,
@@ -46,35 +46,35 @@ const SignInForm = ({ className }: SignInFormProps) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">Вхід</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Enter your email below to login to your account
+          Введіть свої дані для входу
         </p>
       </div>
       <div className="grid gap-6">
         <Input
           id="emailOrUsername"
           type="text"
-          label="Email / Username"
+          label="Email / Нікнейм"
           error={errors.emailOrUsername?.message}
           placeholder="m@example.com"
           {...register("emailOrUsername")}
         />
         <Input
           id="password"
-          label="Password"
+          label="Пароль"
           error={errors.password?.message}
           type="password"
           {...register("password")}
         />
         <Button isLoading={isSubmitting} type="submit" className="w-full">
-          Login
+          Увійти
         </Button>
       </div>
       <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
+        Не маєте аккаунту?{" "}
         <a href={Routes.SignUp} className="underline underline-offset-4">
-          Sign up
+          Зареєструватись
         </a>
       </div>
     </form>

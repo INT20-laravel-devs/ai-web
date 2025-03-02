@@ -45,7 +45,7 @@ export const useChatStore = create<SingleChatState>((set) => ({
     });
   },
 
-  addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
+  addChat: (chat) => set((state) => ({ chats: [chat, ...state.chats] })),
 
   removeChat: (threadId) =>
     set((state) => ({

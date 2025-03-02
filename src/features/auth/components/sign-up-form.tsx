@@ -46,15 +46,15 @@ const SignUpForm = ({ className }: SignUpFormProps) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Create a new account</h1>
+        <h1 className="text-2xl font-bold">Створеня нового аккаунту</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Enter your name, email and password to create an account
+          Введіть свої дані для реєстрації
         </p>
       </div>
       <div className="grid gap-6">
         <Input
           id="name"
-          label="Name"
+          label="Нікнейм"
           error={errors.username?.message}
           placeholder="John Doe"
           {...register("username")}
@@ -69,19 +69,19 @@ const SignUpForm = ({ className }: SignUpFormProps) => {
         />
         <Input
           id="password"
-          label="Password"
+          label="Пароль"
           error={errors.password?.message}
           type="password"
           {...register("password")}
         />
         <Button isLoading={isSubmitting} type="submit" className="w-full">
-          Sign up
+          Зареєструватися
         </Button>
       </div>
       <div className="text-center text-sm">
-        Already have account?{" "}
+        Вже маєте аккаунт?{" "}
         <a href={Routes.SignIn} className="underline underline-offset-4">
-          Sign in
+          Увійти
         </a>
       </div>
     </form>
