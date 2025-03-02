@@ -14,7 +14,7 @@ const ProfilePage = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <SidebarTrigger />
-          <h2 className="text-xl font-semibold text-gray-800">Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Профіль</h2>
         </div>
       </div>
       <ProfileCard user={user!} />
