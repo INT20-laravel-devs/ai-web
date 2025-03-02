@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ArrowRight,
   BarChart3,
@@ -6,7 +7,7 @@ import {
   Settings,
   Wand2,
 } from "lucide-react";
-import { type ChangeEvent,type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useState, useEffect } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -55,27 +56,27 @@ const IntegrationsSection = () => {
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
       id: 1,
-      title: "FICE Advisor",
-      description: "Faculty of Informatics and Computer Engineering",
-      provider: "AI Researcher Expert",
+      title: "ФІКТ Консультант",
+      description: "Факультет інформатики та комп'ютерної техніки",
+      provider: "Експерт дослідник ШІ",
       poweredBy: "GPT-4",
       details:
-        "Get personalized financial advice, investment strategies, and budget planning assistance.",
+        "Отримайте персоналізовані поради, отримання інформації та створення подій.",
       connected: false,
       icon: <Settings className="h-4 w-4" />,
-      initials: "FA",
+      initials: "ФК",
     },
     {
       id: 2,
-      title: "Document Analysis",
-      description: "Extract insights from your documents",
-      provider: "AI Document Analysis",
+      title: "Аналіз документів",
+      description: "Отримайте інсайти з ваших документів",
+      provider: "ШІ Аналіз Документів",
       poweredBy: "GPT-4 Vision",
       details:
-        "Upload documents and get summaries, insights, and answers to your questions.",
+        "Завантажте документи та отримайте резюме, інсайти та відповіді на ваші запитання.",
       connected: false,
       icon: <FileText className="h-4 w-4" />,
-      initials: "DA",
+      initials: "АД",
       comingSoon: true,
     },
   ]);
@@ -91,6 +92,19 @@ const IntegrationsSection = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
 
+  useEffect(() => {
+    const savedConnections = localStorage.getItem("integrationConnections");
+    if (savedConnections) {
+      const parsedConnections = JSON.parse(savedConnections);
+      setIntegrations((prev) =>
+        prev.map((integration) => ({
+          ...integration,
+          connected: parsedConnections[integration?.id] || integration.connected,
+        })),
+      );
+    }
+  }, []);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({
@@ -103,13 +117,25 @@ const IntegrationsSection = () => {
   const handleConnect = (id: number) => {
     const integration = integrations.find((i) => i.id === id);
     if (integration?.connected) {
-      setIntegrations(
-        integrations.map((integration) =>
-          integration.id === id
-            ? { ...integration, connected: false }
-            : integration,
-        ),
+      const updatedIntegrations = integrations.map((integration) =>
+        integration.id === id
+          ? { ...integration, connected: false }
+          : integration,
       );
+      setIntegrations(updatedIntegrations);
+
+      const connectionsState = updatedIntegrations.reduce(
+        (acc, curr) => {
+          acc[curr.id] = curr.connected;
+          return acc;
+        },
+        {} as Record<number, boolean>,
+      );
+      localStorage.setItem(
+        "integrationConnections",
+        JSON.stringify(connectionsState),
+      );
+
       return;
     }
 
@@ -125,12 +151,25 @@ const IntegrationsSection = () => {
     try {
       await loginFiceAdvisor(loginData.email, loginData.password);
 
-      setIntegrations(
-        integrations.map((integration) =>
-          integration.id === currentIntegrationId
-            ? { ...integration, connected: true }
-            : integration,
-        ),
+      const updatedIntegrations = integrations.map((integration) =>
+        integration.id === currentIntegrationId
+          ? { ...integration, connected: true }
+          : integration,
+      );
+
+      setIntegrations(updatedIntegrations);
+
+      // Зберігаємо стан підключень в localStorage
+      const connectionsState = updatedIntegrations.reduce(
+        (acc, curr) => {
+          acc[curr.id] = curr.connected;
+          return acc;
+        },
+        {} as Record<number, boolean>,
+      );
+      localStorage.setItem(
+        "integrationConnections",
+        JSON.stringify(connectionsState),
       );
 
       setLoginDialogOpen(false);
@@ -139,7 +178,7 @@ const IntegrationsSection = () => {
       setLoginError(
         error instanceof Error
           ? error.message
-          : "Failed to connect. Please check your credentials.",
+          : "Не вдалося підключитися. Будь ласка, перевірте ваші облікові дані.",
       );
     } finally {
       setIsLoading(false);
@@ -149,7 +188,7 @@ const IntegrationsSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">Integrations</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Інтеграції</h2>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -165,9 +204,9 @@ const IntegrationsSection = () => {
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">{integration.title}</CardTitle>
-                {integration.connected && <Badge>Connected</Badge>}
+                {integration.connected && <Badge>Підключено</Badge>}
                 {integration.comingSoon && (
-                  <Badge variant="outline">Coming Soon</Badge>
+                  <Badge variant="outline">Скоро</Badge>
                 )}
               </div>
               <CardDescription>{integration.description}</CardDescription>
@@ -184,7 +223,7 @@ const IntegrationsSection = () => {
                 <div>
                   <p className="font-medium">{integration.provider}</p>
                   <p className="text-sm text-muted-foreground">
-                    Powered by {integration.poweredBy}
+                    Працює на {integration.poweredBy}
                   </p>
                 </div>
               </div>
@@ -199,12 +238,12 @@ const IntegrationsSection = () => {
                   className="w-full"
                   onClick={() => handleConnect(integration.id)}
                 >
-                  Configure {integration.icon}
+                  Закрити {integration.icon}
                 </Button>
               ) : integration.comingSoon ? (
                 <Button disabled className="w-full">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Coming Soon
+                  Скоро буде
                 </Button>
               ) : (
                 <Button
@@ -212,7 +251,7 @@ const IntegrationsSection = () => {
                   onClick={() => handleConnect(integration.id)}
                 >
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Connect
+                  Підключити
                 </Button>
               )}
             </CardFooter>
@@ -220,7 +259,7 @@ const IntegrationsSection = () => {
         ))}
       </div>
 
-      {/* FICE Advisor Login Dialog */}
+      {/* ФІКТ Консультант Діалог входу */}
       <Dialog
         open={loginDialogOpen}
         onOpenChange={(open) => {
@@ -233,9 +272,10 @@ const IntegrationsSection = () => {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Connect to FICE Advisor</DialogTitle>
+            <DialogTitle>Підключення до ФІКТ Консультант</DialogTitle>
             <DialogDescription>
-              Enter your credentials to connect to the FICE Advisor integration.
+              Введіть ваші облікові дані для підключення до інтеграції ФІКТ
+              Консультант.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleLogin}>
@@ -246,7 +286,7 @@ const IntegrationsSection = () => {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder="text@example.com"
                   value={loginData.email}
                   onChange={handleInputChange}
                   required
@@ -254,7 +294,7 @@ const IntegrationsSection = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Пароль</Label>
                 <Input
                   id="password"
                   name="password"
@@ -278,10 +318,10 @@ const IntegrationsSection = () => {
                 onClick={() => setLoginDialogOpen(false)}
                 disabled={isLoading}
               >
-                Cancel
+                Скасувати
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Connecting..." : "Connect"}
+                {isLoading ? "Підключення..." : "Підключити"}
               </Button>
             </DialogFooter>
           </form>
