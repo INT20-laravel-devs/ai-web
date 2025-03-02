@@ -1,5 +1,9 @@
 import { Copy } from "lucide-react";
+import { MDXRemote, type MDXRemoteSerializeResult } from "next-mdx-remote";
+import { serialize } from "next-mdx-remote/serialize";
 import React from "react";
+import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
 
 import { type Message } from "@/features/chat/types/chat-types";
 
@@ -17,6 +21,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   handleCopyMessage,
 }) => {
   const isUserMessage = messageIndex % 2 === 0;
+  const [mdxSource, setMdxSource] = React.useState<MDXRemoteSerializeResult<
+    Record<string, unknown>
+  > | null>(null);
+
+  React.useEffect(() => {
+    const prepareMdx = async () => {
+      if (message.content) {
+        const mdxSource = await serialize(message.content, {
+          mdxOptions: {
+            remarkPlugins: [remarkGfm],
+            rehypePlugins: [rehypeHighlight],
+          },
+        });
+        setMdxSource(mdxSource);
+      }
+    };
+
+    void prepareMdx();
+  }, [message.content]);
 
   return (
     <div
@@ -32,7 +55,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               : "rounded-tl-none border border-gray-200 bg-white text-gray-800"
           } `}
         >
-          <p className="text-sm leading-relaxed">{message.content}</p>
+          {mdxSource ? (
+            <div className="prose prose-sm text-sm leading-relaxed">
+              <MDXRemote {...mdxSource} />
+            </div>
+          ) : (
+            <p className="text-sm leading-relaxed">{message.content}</p>
+          )}
         </div>
 
         <div
