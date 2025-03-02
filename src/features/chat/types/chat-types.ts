@@ -4,9 +4,12 @@ export interface Message {
 }
 
 export interface Chat {
-  id: string;
-  title: string;
-  lastActive: string;
+  threadId: string;
+  userId: string;
+  name: any;
+  description: any;
+  createdAt: string;
+  updatedAt: string;
   messages: Message[];
 }
 

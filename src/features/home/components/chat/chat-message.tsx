@@ -16,7 +16,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   messageIndex,
   handleCopyMessage,
 }) => {
-  const isUserMessage = messageIndex % 2 === 0; // Infer if it's a user message based on the index
+  const isUserMessage = messageIndex % 2 === 0;
 
   return (
     <div
