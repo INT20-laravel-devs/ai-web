@@ -6,7 +6,7 @@ import {
   Settings,
   Wand2,
 } from "lucide-react";
-import { useState } from "react";
+import { type ChangeEvent,type FormEvent, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -30,10 +30,29 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { loginFiceAdvisor } from "../api/integrations";
 
+interface Integration {
+  id: number;
+  title: string;
+  description: string;
+  provider: string;
+  poweredBy: string;
+  details: string;
+  connected: boolean;
+  icon: React.ReactNode;
+  initials: string;
+  comingSoon?: boolean;
+}
+
+interface LoginData {
+  email: string;
+  password: string;
+}
+
 const IntegrationsSection = () => {
-  const [integrations, setIntegrations] = useState([
+  const [integrations, setIntegrations] = useState<Integration[]>([
     {
       id: 1,
       title: "FICE Advisor",
@@ -61,26 +80,29 @@ const IntegrationsSection = () => {
     },
   ]);
 
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [currentIntegrationId, setCurrentIntegrationId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [loginData, setLoginData] = useState<LoginData>({
+    email: "",
+    password: "",
+  });
+  const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false);
+  const [currentIntegrationId, setCurrentIntegrationId] = useState<
+    number | null
+  >(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string>("");
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear any previous error messages when user starts typing
     if (loginError) setLoginError("");
   };
 
-  const handleConnect = (id) => {
-    // If already connected, toggle the connection off
+  const handleConnect = (id: number) => {
     const integration = integrations.find((i) => i.id === id);
-    if (integration.connected) {
+    if (integration?.connected) {
       setIntegrations(
         integrations.map((integration) =>
           integration.id === id
@@ -91,21 +113,18 @@ const IntegrationsSection = () => {
       return;
     }
 
-    // If not connected, open the login dialog
     setCurrentIntegrationId(id);
     setLoginDialogOpen(true);
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setLoginError("");
 
     try {
-      // Call the FICE Advisor login API
       await loginFiceAdvisor(loginData.email, loginData.password);
 
-      // Update the connection status if login successful
       setIntegrations(
         integrations.map((integration) =>
           integration.id === currentIntegrationId
@@ -114,13 +133,13 @@ const IntegrationsSection = () => {
         ),
       );
 
-      // Close dialog and reset form
       setLoginDialogOpen(false);
       setLoginData({ email: "", password: "" });
     } catch (error) {
-      // Display error message
       setLoginError(
-        error.message || "Failed to connect. Please check your credentials.",
+        error instanceof Error
+          ? error.message
+          : "Failed to connect. Please check your credentials.",
       );
     } finally {
       setIsLoading(false);

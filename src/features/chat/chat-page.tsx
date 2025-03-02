@@ -167,7 +167,7 @@ const ChatPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-auto p-4">
-        {messages.length === 0 ? (
+        {messages?.length === 0 ? (
           <EmptyChatPlaceholder setInputMessage={setInputMessage} />
         ) : (
           <div className="space-y-4">
