@@ -49,7 +49,7 @@ const IntegrationsSection = () => {
     },
   ]);
 
-  const handleConnect = (id) => {
+  const handleConnect = (id: number) => {
     setIntegrations(
       integrations.map((integration) =>
         integration.id === id
