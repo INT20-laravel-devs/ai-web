@@ -49,20 +49,12 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
-            <Edit className="mr-2 h-4 w-4" />
-            <span>Rename Chat</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Share2 className="mr-2 h-4 w-4" />
-            <span>Share Chat</span>
-          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={onDelete}
             className="cursor-pointer text-red-600 focus:text-red-600"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            <span>Delete Chat</span>
+            <span>Видалити чат</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

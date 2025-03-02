@@ -49,7 +49,7 @@ const ChatItem: React.FC<ChatItemProps> = ({
           <div className="min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center justify-between gap-1">
               <span className="truncate text-sm font-medium">
-                Chat {chatIndex}
+                Чат {chatIndex}
               </span>
               <span className="whitespace-nowrap text-xs font-medium text-gray-500">
                 {formattedDate}

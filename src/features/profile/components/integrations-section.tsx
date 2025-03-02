@@ -7,7 +7,8 @@ import {
   Settings,
   Wand2,
 } from "lucide-react";
-import { type ChangeEvent, type FormEvent, useState, useEffect } from "react";
+import Image from "next/image";
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ import { loginFiceAdvisor } from "../api/integrations";
 
 interface Integration {
   id: number;
+  image?: string;
   title: string;
   description: string;
   provider: string;
@@ -56,8 +58,9 @@ const IntegrationsSection = () => {
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
       id: 1,
-      title: "ФІКТ Консультант",
-      description: "Факультет інформатики та комп'ютерної техніки",
+      image: "/icons/favicon.ico",
+      title: "FICE Advisor",
+      description: "Факультет інформатики та обчилювальної техніки",
       provider: "Експерт дослідник ШІ",
       poweredBy: "GPT-4",
       details:
@@ -99,7 +102,8 @@ const IntegrationsSection = () => {
       setIntegrations((prev) =>
         prev.map((integration) => ({
           ...integration,
-          connected: parsedConnections[integration?.id] || integration.connected,
+          connected:
+            parsedConnections[integration?.id] || integration.connected,
         })),
       );
     }
@@ -203,7 +207,18 @@ const IntegrationsSection = () => {
           >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{integration.title}</CardTitle>
+                <div className="flex h-6 gap-3">
+                  {integration?.image && (
+                    <Image
+                      src={integration.image}
+                      alt={integration.title}
+                      width={24}
+                      height={24}
+                      className="aspect-square"
+                    />
+                  )}
+                  <CardTitle className="text-lg">{integration.title}</CardTitle>
+                </div>
                 {integration.connected && <Badge>Підключено</Badge>}
                 {integration.comingSoon && (
                   <Badge variant="outline">Скоро</Badge>

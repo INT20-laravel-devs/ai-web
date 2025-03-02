@@ -1,14 +1,15 @@
 export const promptExamples = [
   {
-    title: "Website Development",
-    description: "Help me build a responsive landing page for my new product",
+    title: "Інформація про викладача",
+    description:
+      "Надай інформацію про викладача Марковський Олександр Петрович",
   },
   {
-    title: "Code Review",
-    description: "Review my React component for performance issues",
+    title: "Порада щодо вибору предмету",
+    description: "Порадь, який предмет краще вибрати для вивчення",
   },
   {
-    title: "Learn Something New",
-    description: "Explain how GraphQL differs from traditional REST APIs",
+    title: "Порада щодо вибору спеціальності",
+    description: "Порадь, яку спеціальність краще вибрати для вступу",
   },
 ];

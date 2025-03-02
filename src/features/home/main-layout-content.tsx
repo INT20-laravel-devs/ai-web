@@ -38,11 +38,6 @@ const MainLayoutContent = ({ children }: PropsWithChildren) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [threadId]);
 
-  if (!user && !isLoading) {
-    push(Routes.SignIn);
-    return null;
-  }
-
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50">
       <Sidebar className="border-r border-gray-200 bg-white shadow-md">

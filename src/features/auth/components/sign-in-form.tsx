@@ -33,8 +33,7 @@ const SignInForm = ({ className }: SignInFormProps) => {
     try {
       await signIn(data);
       toast.success("Logged in successfully");
-      // replace(Routes.Home);
-      push('/chat')
+      replace(Routes.Profile);
     } catch (e) {
       if (e instanceof Error) toast.error(e.message);
       console.error(e);

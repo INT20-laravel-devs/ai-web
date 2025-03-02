@@ -20,25 +20,25 @@ const EmptyChatPlaceholder: React.FC<EmptyChatPlaceholderProps> = ({
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
       <div className="bg-primary-100 mb-4 rounded-full p-6 shadow-md transition-all hover:shadow-lg">
-        <MessageCircle className="text-primary h-12 w-12" />
+        <MessageCircle className="h-12 w-12 text-primary" />
       </div>
       <h3 className="mb-2 text-xl font-semibold text-gray-800">
-        Start the conversation
+        Почніть спілкування
       </h3>
       <p className="mb-10 max-w-md text-gray-500">
-        Begin by typing a message below to get professional assistance.
+        Ви можете оберати один з прикладів нижче, щоб почати спілкування.
       </p>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {promptExamples.map((example, index) => (
-            <PromptExampleCard
-              key={index}
-              title={example.title}
-              description={example.description}
-              onClick={() => handleExampleClick(example)}
-            />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {promptExamples.map((example, index) => (
+          <PromptExampleCard
+            key={index}
+            title={example.title}
+            description={example.description}
+            onClick={() => handleExampleClick(example)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

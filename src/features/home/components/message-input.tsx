@@ -1,4 +1,4 @@
-import { Check,Clock, Send } from "lucide-react";
+import { Check, Clock, Send } from "lucide-react";
 import React from "react";
 
 interface MessageInputProps {
@@ -21,7 +21,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onKeyDown={(e) =>
             e.key === "Enter" && !e.shiftKey && handleSendMessage()
           }
-          placeholder="Type your message..."
+          placeholder="Напишіть повідомлення..."
           className="flex-1 rounded-full border border-gray-300 p-3 text-gray-800 transition duration-300 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         />
         <button
