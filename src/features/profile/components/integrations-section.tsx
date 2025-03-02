@@ -195,7 +195,7 @@ const IntegrationsSection = () => {
         <h2 className="text-xl font-semibold text-gray-800">Інтеграції</h2>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         {integrations.map((integration) => (
           <Card
             key={integration.id}
