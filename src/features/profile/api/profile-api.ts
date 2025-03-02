@@ -1,4 +1,5 @@
 import { API_URL } from "@/constants/global";
+import { ErrorResponse } from "@/types/api";
 import {
   generateAuthHeaders,
   generateAuthHeadersAvatar,
@@ -13,9 +14,10 @@ export const updateAvatar = async (formData: FormData) => {
       headers: generateAuthHeadersAvatar(),
     });
 
+   
     if (!res.ok) {
-      const response = await res.json();
-      console.log(response);
+      const error: ErrorResponse = await res.json();
+      throw new Error(error.message);
     }
 
     return res;
@@ -32,10 +34,10 @@ export const updateProfile = async (userId: string, username: string) => {
       headers: generateAuthHeaders(),
     });
 
-    if (!res.ok) {
-      const response = await res.json();
-      console.log(response);
-    }
+     if (!res.ok) {
+       const error: ErrorResponse = await res.json();
+       throw new Error(error.message);
+     }
 
     return res;
   } catch (e) {

@@ -1,4 +1,5 @@
 import { API_URL } from "@/constants/global";
+import { ErrorResponse } from "@/types/api";
 import { generateAuthHeaders } from "@/utils/api-utils";
 
 export const loginFiceAdvisor = async (username: string, password: string) => {
@@ -9,9 +10,10 @@ export const loginFiceAdvisor = async (username: string, password: string) => {
       body: JSON.stringify({ username, password }),
     });
 
+
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "Failed to login to FICE Advisor");
+      const error: ErrorResponse = await res.json();
+      throw new Error(error.message);
     }
 
     return res;
