@@ -11,7 +11,6 @@ export const protectedPages = [Routes.Chat, Routes.Profile];
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { replace } = useRouter();
 
   const isProtectedPage = protectedPages.some((page) =>
@@ -33,7 +32,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     fetchUser().catch((error) => console.error(error));
-  }, [pathname, searchParams]);
+  }, []);
 
   return <>{children}</>;
 };
