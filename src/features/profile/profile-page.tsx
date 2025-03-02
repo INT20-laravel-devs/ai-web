@@ -10,7 +10,7 @@ import useAuthStore from "@/store/use-auth-store";
 const ProfilePage = () => {
   const { user } = useAuthStore();
   return (
-    <div className="space-y-4 p-6">
+    <div className="space-y-4 p-6 overflow-y-scroll">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <SidebarTrigger />
